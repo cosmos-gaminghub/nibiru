@@ -1,0 +1,67 @@
+version: '3'
+
+services:
+  nbrdnode0:
+    container_name: nbrdnode0
+    image: "nbrchain/nbrdnode"
+    ports:
+      - "26656-26657:26656-26657"
+    environment:
+      - ID=0
+      - LOG=${LOG:-nbrd.log}
+    volumes:
+      - ./build:/nbrd:Z
+    networks:
+      localnet:
+        ipv4_address: 192.168.10.2
+
+  nbrdnode1:
+    container_name: nbrdnode1
+    image: "nbrchain/nbrdnode"
+    ports:
+      - "26659-26660:26656-26657"
+    environment:
+      - ID=1
+      - LOG=${LOG:-nbrd.log}
+    volumes:
+      - ./build:/nbrd:Z
+    networks:
+      localnet:
+        ipv4_address: 192.168.10.3
+
+  nbrdnode2:
+    container_name: nbrdnode2
+    image: "nbrchain/nbrdnode"
+    environment:
+      - ID=2
+      - LOG=${LOG:-nbrd.log}
+    ports:
+      - "26661-26662:26656-26657"
+    volumes:
+      - ./build:/nbrd:Z
+    networks:
+      localnet:
+        ipv4_address: 192.168.10.4
+
+  nbrdnode3:
+    container_name: nbrdnode3
+    image: "nbrchain/nbrdnode"
+    environment:
+      - ID=3
+      - LOG=${LOG:-nbrd.log}
+    ports:
+      - "26663-26664:26656-26657"
+    volumes:
+      - ./build:/nbrd:Z
+    networks:
+      localnet:
+        ipv4_address: 192.168.10.5
+
+networks:
+  localnet:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      -
+        subnet: 192.168.10.0/16
