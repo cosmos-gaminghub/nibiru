@@ -1,0 +1,15 @@
+{
+  "name": "docs",
+  "version": "1.0.0",
+  "description": "nibiru documentation",
+  "main": "index.js",
+  "repository": "https://github.com/cosmos-gaminghub/nibiru",
+  "license": "MIT",
+  "devDependencies": {
+    "vuepress": "^1.2.0"
+  },
+  "scripts": {
+    "dev": "vuepress dev",
+    "build": "vuepress build"
+  }
+}
