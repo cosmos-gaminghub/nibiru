@@ -51,7 +51,7 @@ build:
 	go build $(BUILD_FLAGS) -o build/nbrd ./cmd/nbrd
 	go build $(BUILD_FLAGS) -o build/nbrcli ./cmd/nbrcli
 
-#docker用のbinaryを作る
+# make binary for docker
 build-linux: go.sum
 	GOOS=linux GOARCH=amd64 $(MAKE) build
 

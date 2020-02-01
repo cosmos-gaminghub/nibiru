@@ -2,7 +2,7 @@ FROM alpine:3.7
 
 RUN apk update && \
     apk upgrade && \
-    apk --no-cache add curl jq file
+    apk --no-cache add curl jq file vim
 
 VOLUME [ /nbrd ]
 WORKDIR /nbrd

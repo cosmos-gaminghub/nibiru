@@ -31,7 +31,7 @@ $ sh scripts/start.sh
 Or you can follow the command.
 
 ```bash
-$ nbrd init eguegu --chain-id testchain
+$ nbrd init <your_moniker> --chain-id testchain
 ```
 
 **Copy the `Address` output here and save it for later use**
@@ -43,7 +43,7 @@ $ nbrcli keys add jack
 **Add account with coins to the genesis file**
 
 ```bash
-$ nbrd add-genesis-account $(nbrcli keys show jack -a) 100000000nbr,100000000stake
+$ nbrd add-genesis-account $(nbrcli keys show jack -a) 100000000quark,100000000lepton
 ```
 
 **Configure your CLI to eliminate need for chain-id flag**
