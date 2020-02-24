@@ -10,6 +10,7 @@
   },
   "scripts": {
     "dev": "vuepress dev",
-    "build": "vuepress build"
+    "build": "vuepress build",
+    "deploy": "export $(cat .env | grep -v ^# | xargs); sh deploy-s3.sh"
   }
 }
