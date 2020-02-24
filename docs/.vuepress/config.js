@@ -25,6 +25,13 @@ module.exports = {
                 children: [
                     ["testnets/overview", "Overview"]
                 ]
+            },
+            {
+                title: "Fullnode",
+                collapsable: false,
+                children: [
+                    ["fullnode/install", "Install"]
+                ]
             }
         ],
     }
