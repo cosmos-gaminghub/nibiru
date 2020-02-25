@@ -32,6 +32,13 @@ module.exports = {
                 children: [
                     ["fullnode/install", "Install"]
                 ]
+            },
+            {
+                title: "Validators",
+                collapsable: false,
+                children: [
+                    ["validators/setup", "Setup"]
+                ]
             }
         ],
     }
