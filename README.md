@@ -19,6 +19,8 @@ To run a full-node for the testnet of the Cosmos Gaming Hub, first [install nibi
 
 For testnet genesis file, see the [testnet repo](https://github.com/cosmos-gaminghub/testnets).
 
+[**Documantation**](http://docs.cosmosgaminghub.com/)
+
 ## Quick Start
 
 ```sh
