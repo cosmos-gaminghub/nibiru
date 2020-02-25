@@ -20,26 +20,28 @@ module.exports = {
         sidebarDepth: 2,
         sidebar: [
             {
-                title: "Testnets",
+                title: "Installation",
                 collapsable: false,
                 children: [
-                    ["testnets/overview", "Overview"]
+                    ["install/install", "Install"],
                 ]
             },
             {
-                title: "Fullnode",
+                title: "Testnet",
                 collapsable: false,
                 children: [
-                    ["fullnode/install", "Install"]
+                    ["testnets/fullnode", "Fullnode"],
+                    ["testnets/validator", "Validator"],
                 ]
             },
             {
-                title: "Validators",
+                title: "Localnet",
                 collapsable: false,
                 children: [
-                    ["validators/setup", "Setup"]
+                    ["localnets/localnet", "Localnet"],
+                    ["localnets/4-node", "4-Node"],
                 ]
-            }
+            },
         ],
     }
 };
