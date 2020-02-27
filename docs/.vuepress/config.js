@@ -1,7 +1,9 @@
 module.exports = {
     title: "Nibiru",
     description: "Documentation for the Cosmos Gaming Hub",
-    head: [],
+    head: [
+        ['link', {rel: 'icon', href: '/assets/logo.png'}],
+		],
     markdown: {
         lineNumbers: true,
     },
