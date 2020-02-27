@@ -107,7 +107,7 @@ type nibiruApp struct {
 	mm *module.Manager
 }
 
-// NewnibiruApp returns a reference to an initialized nibiruApp.
+// NewNibiruApp returns a reference to an initialized nibiruApp.
 func NewNibiruApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool,
 	invCheckPeriod uint, baseAppOptions ...func(*bam.BaseApp)) *nibiruApp {
 
@@ -260,7 +260,7 @@ func (app *nibiruApp) LoadHeight(height int64) error {
 func (app *nibiruApp) ModuleAccountAddrs() map[string]bool {
 	modAccAddrs := make(map[string]bool)
 	for acc := range maccPerms {
-		modAccAddrs[app.supplyKeeper.GetModuleAddress(acc).String()] = true
+		modAccAddrs[supply.NewModuleAddress(acc).String()] = true
 	}
 
 	return modAccAddrs

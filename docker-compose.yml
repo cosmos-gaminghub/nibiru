@@ -3,7 +3,7 @@ version: '3'
 services:
   nbrdnode0:
     container_name: nbrdnode0
-    image: "nbrchain/nbrdnode"
+    image: "cosmos-gaminghub/nbrdnode"
     ports:
       - "26656-26657:26656-26657"
     environment:
@@ -17,7 +17,7 @@ services:
 
   nbrdnode1:
     container_name: nbrdnode1
-    image: "nbrchain/nbrdnode"
+    image: "cosmos-gaminghub/nbrdnode"
     ports:
       - "26659-26660:26656-26657"
     environment:
@@ -31,7 +31,7 @@ services:
 
   nbrdnode2:
     container_name: nbrdnode2
-    image: "nbrchain/nbrdnode"
+    image: "cosmos-gaminghub/nbrdnode"
     environment:
       - ID=2
       - LOG=${LOG:-nbrd.log}
@@ -45,7 +45,7 @@ services:
 
   nbrdnode3:
     container_name: nbrdnode3
-    image: "nbrchain/nbrdnode"
+    image: "cosmos-gaminghub/nbrdnode"
     environment:
       - ID=3
       - LOG=${LOG:-nbrd.log}

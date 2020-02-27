@@ -8,7 +8,7 @@ FROM golang:alpine AS build-env
 ENV PACKAGES curl make git libc-dev bash gcc linux-headers eudev-dev python vim
 
 # Set working directory for the build
-WORKDIR /go/src/github.com/EG-easy/nbrchain
+WORKDIR /go/src/github.com/cosmos-gaminghub/nibiru
 
 # Add source files
 COPY . .

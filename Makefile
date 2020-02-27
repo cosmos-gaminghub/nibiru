@@ -51,7 +51,7 @@ build:
 	go build $(BUILD_FLAGS) -o build/nbrd ./cmd/nbrd
 	go build $(BUILD_FLAGS) -o build/nbrcli ./cmd/nbrcli
 
-#docker用のbinaryを作る
+# make binary for docker
 build-linux: go.sum
 	GOOS=linux GOARCH=amd64 $(MAKE) build
 
@@ -61,7 +61,7 @@ build-docker:
 
 # Run a 4-node testnet locally
 localnet-start: build-linux localnet-stop
-	@if ! [ -f build/node0/nbrd/config/genesis.json ]; then docker run --rm -v $(CURDIR)/build:/nbrd:Z nbrchain/nbrdnode testnet --v 4 -o . --starting-ip-address 192.168.10.2 ; fi
+	@if ! [ -f build/node0/nbrd/config/genesis.json ]; then docker run --rm -v $(CURDIR)/build:/nbrd:Z cosmos-gaminghub/nbrdnode testnet --v 4 -o . --starting-ip-address 192.168.10.2 ; fi
 	docker-compose up -d
 
 # Stop testnet
