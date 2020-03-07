@@ -31,7 +31,8 @@ With `golang`, you can compile and run `nibiru`.
 
 ```sh
 git clone github.com/cosmos-gaminghub/nibiru.git
-cd nibiru && git checkout master
+git fetch --all --tags
+cd nibiru && git checkout -b tag0.2 tags/v0.2
 make install
 ```
 
