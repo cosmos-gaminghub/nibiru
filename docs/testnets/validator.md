@@ -32,6 +32,11 @@ nbrd tendermint show-validator
 
 If your node is sync fully, then you can run the following command to upgrade your node to be a validator.
 
+:::tip testnet faucet
+You need some quark as Gus to send a tx.
+Please ask [info@cosmosgaminghub.org](mailto:info@cosmosgaminghub.org) for faucet token with your address starting `nibiru`.
+:::
+
 ```sh
 nbrcli tx staking create-validator \
   --amount=1000quark \
