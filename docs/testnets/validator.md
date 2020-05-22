@@ -66,7 +66,7 @@ You can edit your validator metadata with the following command.
 
 
 ```sh
-nbrcli tx staking edit-validator
+nbrcli tx staking edit-validator \
   --moniker=<your_validator_name> \
   --website=<your_website> \
   --identity=<your_keybase_identity> \
