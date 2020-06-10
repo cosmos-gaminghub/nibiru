@@ -17,10 +17,22 @@ $ nbrd init <your_moniker> --chain-id testchain
 $ nbrcli keys add jack
 ```
 
-**Add account with coins to the genesis file**
+**Add account with tokens to the genesis file**.
 
 ```sh
 $ nbrd add-genesis-account $(nbrcli keys show jack -a) 100000000quark,100000000lepton
+```
+
+Default denom is `stake`, so if you want to customize the denom(ex:quark, lepton), you have to edit `genesis.json` like below command.
+
+```
+$ sed -i "s/\"stake\"/\"quark\"/g" ~/.nbrd/config/genesis.json
+```
+
+if you use Mac, then the command should be like this.
+
+```
+$ sed -i "" "s/\"stake\"/\"quark\"/g" ~/.nbrd/config/genesis.json
 ```
 
 **Configure your CLI to eliminate need for chain-id flag**
@@ -33,7 +45,8 @@ $ nbrcli config trust-node true
 ```
 
 ```sh
-$ nbrd gentx --name jack
+# gentx is the create-validator command from genesis state, deciding how much token is self-delegated at the first place.
+$ nbrd gentx --amount 100000000quark --name jack
 $ nbrd collect-gentxs
 $ nbrd validate-genesis
 ```
