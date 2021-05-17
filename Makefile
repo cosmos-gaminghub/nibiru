@@ -36,7 +36,6 @@ all: lint install
 
 install: go.sum
 		go install $(BUILD_FLAGS) ./cmd/nbrd
-		go install $(BUILD_FLAGS) ./cmd/nbrcli
 
 go.sum: go.mod
 		@echo "--> Ensure dependencies have not been modified"
