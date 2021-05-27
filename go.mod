@@ -5,7 +5,7 @@ go 1.16
 require (
 	github.com/btcsuite/btcd v0.21.0-beta
 	github.com/btcsuite/btcutil v1.0.2
-	github.com/cosmos/cosmos-sdk v0.42.4
+	github.com/cosmos/cosmos-sdk v0.42.5
 	github.com/ethereum/go-ethereum v1.10.3
 	github.com/go-git/go-git/v5 v5.1.0
 	github.com/goccy/go-yaml v1.8.9
@@ -13,7 +13,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/imdario/mergo v0.3.12
 	github.com/mattn/go-zglob v0.0.3
-	github.com/otiai10/copy v1.4.2
+	github.com/otiai10/copy v1.6.0
 	github.com/pelletier/go-toml v1.8.1
 	github.com/pkg/errors v0.9.1
 	github.com/radovskyb/watcher v1.0.7
