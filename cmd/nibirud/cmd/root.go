@@ -51,7 +51,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		WithHomeDir(nibiru.DefaultNodeHome)
 
 	rootCmd := &cobra.Command{
-		Use:   "nbrd",
+		Use:   "nibirud",
 		Short: "Nibiru Hub App Daemon (server)",
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			if err := client.SetCmdClientContextHandler(initClientCtx, cmd); err != nil {
