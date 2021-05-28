@@ -7,7 +7,7 @@ import (
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
 
 	app "github.com/cosmos-gaminghub/nibiru/app"
-	"github.com/cosmos-gaminghub/nibiru/cmd/nbrd/cmd"
+	"github.com/cosmos-gaminghub/nibiru/cmd/nibirud/cmd"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

@@ -6,8 +6,8 @@ accounts:
 validator:
   name: alice
   staked: "100000000stake"
-client:
-  vuex:
-    path: "vue/src/store"
+# client:
+#   vuex:
+#     path: "vue/src/store"
 build:
   binary: "nbrd"
