@@ -35,7 +35,7 @@ BUILD_FLAGS := -tags "$(build_tags)" -ldflags '$(ldflags)'
 all: lint install
 
 install: go.sum
-		go install $(BUILD_FLAGS) ./cmd/nbrd
+		go install $(BUILD_FLAGS) ./cmd/nibirud
 
 go.sum: go.mod
 		@echo "--> Ensure dependencies have not been modified"
@@ -47,7 +47,7 @@ lint:
 	go mod verify
 
 build:
-	go build $(BUILD_FLAGS) -o build/nbrd ./cmd/nbrd
+	go build $(BUILD_FLAGS) -o build/nbrd ./cmd/nibirud
 	go build $(BUILD_FLAGS) -o build/nbrcli ./cmd/nbrcli
 
 # make binary for docker
