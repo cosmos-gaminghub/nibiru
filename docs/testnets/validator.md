@@ -1,5 +1,9 @@
 # Become A Validator
 
+::: warning
+This is v0.2 instruction, v0.3 instruction and its testnet are comming soon.
+:::
+
 :::tip Required
 [Run Nibiru Full Node](/testnets/fullnode.md)
 :::
