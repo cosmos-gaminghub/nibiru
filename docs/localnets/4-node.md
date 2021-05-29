@@ -1,5 +1,9 @@
 # Start 4 Node
 
+::: warning
+This is v0.2 instruction, v0.3 instruction and its testnet are comming soon.
+:::
+
 :::tip Required
 - Docker is required to run 4 Node in your localnet.
 :::

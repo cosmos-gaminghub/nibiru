@@ -20,7 +20,6 @@ build_tags_comma_sep := $(subst $(whitespace),$(comma),$(build_tags))
 
 ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=nbr \
 		  -X github.com/cosmos/cosmos-sdk/version.ServerName=nbrd \
-		  -X github.com/cosmos/cosmos-sdk/version.ClientName=nbrcli \
 		  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 		  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
 		  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)"
@@ -48,7 +47,6 @@ lint:
 
 build:
 	go build $(BUILD_FLAGS) -o build/nbrd ./cmd/nibirud
-	go build $(BUILD_FLAGS) -o build/nbrcli ./cmd/nbrcli
 
 # make binary for docker
 build-linux: go.sum

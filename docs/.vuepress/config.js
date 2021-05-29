@@ -44,6 +44,13 @@ module.exports = {
                     ["localnets/4-node", "4-Node"],
                 ]
             },
+            {
+                title: "Config",
+                collapsable: false,
+                children: [
+                    ["config/service", "Service"],
+                ]
+            },
         ],
     }
 };

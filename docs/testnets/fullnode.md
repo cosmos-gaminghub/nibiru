@@ -1,5 +1,8 @@
-
 # Run Nibiru Full Node
+
+::: warning
+This is v0.2 instruction, v0.3 instruction and its testnet are comming soon.
+:::
 
 :::tip Required
 [Install Nibiru](/install/install.md)

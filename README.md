@@ -12,7 +12,7 @@ This repository hosts `Nibiru`, based on the [Cosmos SDK](https://github.com/cos
 
 **WARNING**: Nibiru is under VERY ACTIVE DEVELOPMENT and should be treated as pre-alpha software. This means it is not meant to be run in production, its APIs are subject to change without warning and should not be relied upon, and it should not be used to hold any value.
 
-**Go 1.13.0+** is required
+**Go 1.16.0+** is required
 
 To run a full-node for the testnet of the Cosmos Gaming Hub, first [install nibiru](docs/install/install.md), then follow the [guide](docs/testnets/fullnode.md).
 
