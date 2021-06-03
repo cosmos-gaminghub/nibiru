@@ -2,12 +2,49 @@ syntax = "proto3";
 package cosmosgaminghub.nibiru.NFTMarket;
 
 // this line is used by starport scaffolding # proto/tx/import
+import "NFTMarket/item.proto";
 
 option go_package = "github.com/cosmos-gaminghub/nibiru/x/NFTMarket/types";
 
 // Msg defines the Msg service.
 service Msg {
     // this line is used by starport scaffolding # proto/tx/rpc
+  rpc CreateItem(MsgCreateItem) returns (MsgCreateItemResponse);
+  rpc UpdateItem(MsgUpdateItem) returns (MsgUpdateItemResponse);
+  rpc DeleteItem(MsgDeleteItem) returns (MsgDeleteItemResponse);
 }
 
 // this line is used by starport scaffolding # proto/tx/message
+message MsgCreateItem {
+  string creator = 1;
+  string Denom = 2;
+  string NFTID = 3;
+  string Price = 4;
+  string Fee = 5;
+  string Detail = 6;
+  bool InSale = 7;
+}
+
+message MsgCreateItemResponse {
+  uint64 id = 1;
+}
+
+message MsgUpdateItem {
+  string creator = 1;
+  uint64 id = 2;
+  string Denom = 3;
+  string NFTID = 4;
+  string Price = 5;
+  string Fee = 6;
+  string Detail = 7;
+  bool InSale = 8;
+}
+
+message MsgUpdateItemResponse { }
+
+message MsgDeleteItem {
+  string creator = 1;
+  uint64 id = 2;
+}
+
+message MsgDeleteItemResponse { }

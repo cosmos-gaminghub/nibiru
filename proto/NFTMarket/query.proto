@@ -4,12 +4,40 @@ package cosmosgaminghub.nibiru.NFTMarket;
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 // this line is used by starport scaffolding # 1
+import "NFTMarket/item.proto";
 
 option go_package = "github.com/cosmos-gaminghub/nibiru/x/NFTMarket/types";
 
 // Query defines the gRPC querier service.
 service Query {
     // this line is used by starport scaffolding # 2
+
+	// Queries a item by id.
+	rpc Item(QueryGetItemRequest) returns (QueryGetItemResponse) {
+		option (google.api.http).get = "/cosmos-gaminghub/nibiru/NFTMarket/item/{id}";
+	}
+
+	// Queries a list of item items.
+	rpc ItemAll(QueryAllItemRequest) returns (QueryAllItemResponse) {
+		option (google.api.http).get = "/cosmos-gaminghub/nibiru/NFTMarket/item";
+	}
+
 }
 
 // this line is used by starport scaffolding # 3
+message QueryGetItemRequest {
+	uint64 id = 1;
+}
+
+message QueryGetItemResponse {
+	Item Item = 1;
+}
+
+message QueryAllItemRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllItemResponse {
+	repeated Item Item = 1;
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
