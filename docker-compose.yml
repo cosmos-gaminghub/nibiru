@@ -1,58 +1,58 @@
 version: '3'
 
 services:
-  nbrdnode0:
-    container_name: nbrdnode0
-    image: "cosmos-gaminghub/nbrdnode"
+  nibirudnode0:
+    container_name: nibirudnode0
+    image: "cosmos-gaminghub/nibirudnode"
     ports:
       - "26656-26657:26656-26657"
     environment:
       - ID=0
-      - LOG=${LOG:-nbrd.log}
+      - LOG=${LOG:-nibirud.log}
     volumes:
-      - ./build:/nbrd:Z
+      - ./build:/nibirud:Z
     networks:
       localnet:
         ipv4_address: 192.168.10.2
 
-  nbrdnode1:
-    container_name: nbrdnode1
-    image: "cosmos-gaminghub/nbrdnode"
+  nibirudnode1:
+    container_name: nibirudnode1
+    image: "cosmos-gaminghub/nibirudnode"
     ports:
       - "26659-26660:26656-26657"
     environment:
       - ID=1
-      - LOG=${LOG:-nbrd.log}
+      - LOG=${LOG:-nibirud.log}
     volumes:
-      - ./build:/nbrd:Z
+      - ./build:/nibirud:Z
     networks:
       localnet:
         ipv4_address: 192.168.10.3
 
-  nbrdnode2:
-    container_name: nbrdnode2
-    image: "cosmos-gaminghub/nbrdnode"
+  nibirudnode2:
+    container_name: nibirudnode2
+    image: "cosmos-gaminghub/nibirudnode"
     environment:
       - ID=2
-      - LOG=${LOG:-nbrd.log}
+      - LOG=${LOG:-nibirud.log}
     ports:
       - "26661-26662:26656-26657"
     volumes:
-      - ./build:/nbrd:Z
+      - ./build:/nibirud:Z
     networks:
       localnet:
         ipv4_address: 192.168.10.4
 
-  nbrdnode3:
-    container_name: nbrdnode3
-    image: "cosmos-gaminghub/nbrdnode"
+  nibirudnode3:
+    container_name: nibirudnode3
+    image: "cosmos-gaminghub/nibirudnode"
     environment:
       - ID=3
-      - LOG=${LOG:-nbrd.log}
+      - LOG=${LOG:-nibirud.log}
     ports:
       - "26663-26664:26656-26657"
     volumes:
-      - ./build:/nbrd:Z
+      - ./build:/nibirud:Z
     networks:
       localnet:
         ipv4_address: 192.168.10.5
