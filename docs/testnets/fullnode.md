@@ -1,9 +1,5 @@
 # Run Nibiru Full Node
 
-::: warning
-This is v0.2 instruction, v0.3 instruction and its testnet are comming soon.
-:::
-
 :::tip Required
 [Install Nibiru](/install/install.md)
 :::
@@ -11,16 +7,40 @@ This is v0.2 instruction, v0.3 instruction and its testnet are comming soon.
 ## Initialize node
 
 ```sh
-nbrd init <your_moniker>
+nbrd init <your_moniker> --chain-id=nibiru-2000
 ```
 
-After that command, you can confirm that `.nbrd` folder is created in your home directory.
+After that command, you can confirm that `.nibirud` folder is created in your home directory.
 
-## Genesis file
+## GenTx Collection ( Until August 28, 2021 11:00 GMT)
+1. Initialize the nibiru directories and create the local file with the correct chain-id
+
+```
+nibirud init <moniker> --chain-id=nibiru-2000
+```
+
+2. Create a local key pair in the keybase
+```
+nibirud keys add <your key name>
+```
+
+3. Add tour account to your local genesis file with a given amount and key you just created.
+```
+nibirud add-genesis-account $(nibirud keys show eg -a) 100000000000game
+```
+
+4. Create the gentx
+```
+nibirud gentx <your key name> 100000000000game --commission-rate=0.1 --commission-max-rate=1 --commission-max-change-rate=0.1 --pubkey $(nibirud tendermint show-validator) --chain-id=nibiru-2000
+```
+
+5. Create Pull Request to [the testnet repo](https://github.com/cosmos-gaminghub/testnets).
+
+## Genesis file ( From August 28, 2021 11:00 GMT)
 Nibiru testnets genesis file is in [testnets repo](https://github.com/cosmos-gaminghub/testnets).
 Download the latest genesis file by running the following command.
 ```sh
-curl -o $HOME/.nbrd/config/genesis.json https://raw.githubusercontent.com/cosmos-gaminghub/testnets/master/latest/genesis.json
+curl -o $HOME/.nibirud/config/genesis.json https://raw.githubusercontent.com/cosmos-gaminghub/testnets/master/latest/genesis.json
 ```
 
 
@@ -29,7 +49,7 @@ To connect other nodes running in the network, you have to set the seed nodes in
 Open the `config.toml` file with vim editor, for example.
 
 ```sh
-vim $HOME/.nbrd/config/config.toml
+vim $HOME/.nibirud/config/config.toml
 ```
 
 ```config.toml
@@ -38,7 +58,7 @@ persistent_peers = "<node_id>@<node_ip_address>:<port>,<node_id>@<node_ip_addres
 
 ## Run Full Node
 ```sh
-nbrd start
+nibirud start
 ```
 
 It will take some time to sync with other node.
@@ -48,5 +68,5 @@ So be patient until your node find other available connections.
 You can check sync status with the following command.
 
 ```sh
-nbrcli status
+nibirud status
 ```
