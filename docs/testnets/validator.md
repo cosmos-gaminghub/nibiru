@@ -9,7 +9,7 @@ This is v0.2 instruction, v0.3 instruction and its testnet are comming soon.
 :::
 
 ## Create a Wallet
-Firstly, you neeed to create wallet or import existing wallet, then get some quark from the faucet.
+Firstly, you neeed to create wallet or import existing wallet, then get some game from the faucet.
 
 ```
 nbrcli keys add <wallet_name>
@@ -37,13 +37,13 @@ nbrd tendermint show-validator
 If your node is sync fully, then you can run the following command to upgrade your node to be a validator.
 
 :::tip testnet faucet
-You need some quark as Gus to send a tx.
+You need some game as Gus to send a tx.
 Please ask [info@cosmosgaminghub.org](mailto:info@cosmosgaminghub.org) for faucet token with your address starting `nibiru`.
 :::
 
 ```sh
 nbrcli tx staking create-validator \
-  --amount=1000quark \
+  --amount=1000game \
   --pubkey=$(nbrd tendermint show-validator) \
   --moniker=<your_validator_name> \
   --chain-id=<chain_id> \
