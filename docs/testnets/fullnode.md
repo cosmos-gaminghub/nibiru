@@ -7,7 +7,7 @@
 ## Initialize node
 
 ```sh
-nbrd init <your_moniker> --chain-id=nibiru-2000
+nibirud init <your_moniker> --chain-id=nibiru-2000
 ```
 
 After that command, you can confirm that `.nibirud` folder is created in your home directory.

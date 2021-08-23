@@ -44,3 +44,6 @@ make install
 
 Try `nibirud version` to verify that everything is fine.
 
+::: tip Tips
+If you are using ubuntu, make sure to install build tools with the command `apt install build-essential` before `make install`.
+:::
