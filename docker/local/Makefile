@@ -1,7 +1,7 @@
-# Makefile for the "nbrdnode" docker image.
+# Makefile for the "nibirudnode" docker image.
 
 all:
-	docker build --tag cosmos-gaminghub/nbrdnode nbrdnode
+	docker build --tag cosmos-gaminghub/nibirudnode nibirudnode
 
 .PHONY: all
 
