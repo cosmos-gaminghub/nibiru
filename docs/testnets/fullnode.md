@@ -40,7 +40,7 @@ nibirud gentx <your key name> 100000000000game --commission-rate=0.1 --commissio
 Nibiru testnets genesis file is in [testnets repo](https://github.com/cosmos-gaminghub/testnets).
 Download the latest genesis file by running the following command.
 ```sh
-curl -o $HOME/.nibirud/config/genesis.json https://raw.githubusercontent.com/cosmos-gaminghub/testnets/master/latest/genesis.json
+curl -o $HOME/.nibiru/config/genesis.json https://raw.githubusercontent.com/cosmos-gaminghub/testnets/master/latest/genesis.json
 ```
 
 
