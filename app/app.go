@@ -3,14 +3,12 @@ package app
 import (
 	"io"
 	stdlog "log"
-	"net/http"
 	"os"
 	"path/filepath"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/simapp"
-	"github.com/ilgooz/openapiconsole"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
@@ -96,8 +94,6 @@ import (
 	"github.com/cosmos-gaminghub/nibiru/x/auction"
 	auctionkeeper "github.com/cosmos-gaminghub/nibiru/x/auction/keeper"
 	auctiontypes "github.com/cosmos-gaminghub/nibiru/x/auction/types"
-
-	docs "github.com/cosmos-gaminghub/nibiru/swagger"
 )
 
 const (
@@ -606,9 +602,10 @@ func (app *NibiruApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.API
 	ModuleBasics.RegisterRESTRoutes(clientCtx, apiSvr.Router)
 	ModuleBasics.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 
-	// register app's OpenAPI routes.
-	apiSvr.Router.Handle("/static/openapi.yml", http.FileServer(http.FS(docs.Docs)))
-	apiSvr.Router.HandleFunc("/", openapiconsole.Handler(appName, "/static/openapi.yml"))
+	// register swagger API from root so that other applications can override easily
+	// if apiConfig.Swagger {
+	// 	RegisterSwaggerAPI(apiSvr.Router)
+	// }
 }
 
 // RegisterTxService implements the Application.RegisterTxService method.
