@@ -93,12 +93,9 @@ import (
 	// unnamed import of statik for swagger UI support
 	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
-	"github.com/cosmos-gaminghub/nibiru/x/NFTAuction"
-	NFTAuctionkeeper "github.com/cosmos-gaminghub/nibiru/x/NFTAuction/keeper"
-	NFTAuctiontypes "github.com/cosmos-gaminghub/nibiru/x/NFTAuction/types"
-	"github.com/cosmos-gaminghub/nibiru/x/NFTMarket"
-	NFTMarketkeeper "github.com/cosmos-gaminghub/nibiru/x/NFTMarket/keeper"
-	NFTMarkettypes "github.com/cosmos-gaminghub/nibiru/x/NFTMarket/types"
+	"github.com/cosmos-gaminghub/nibiru/x/auction"
+	auctionkeeper "github.com/cosmos-gaminghub/nibiru/x/auction/keeper"
+	auctiontypes "github.com/cosmos-gaminghub/nibiru/x/auction/types"
 
 	docs "github.com/cosmos-gaminghub/nibiru/swagger"
 )
@@ -137,8 +134,7 @@ var (
 		nft.AppModuleBasic{},
 
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
-		NFTMarket.AppModuleBasic{},
-		NFTAuction.AppModuleBasic{},
+		auction.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -209,9 +205,7 @@ type NibiruApp struct { // nolint: golint
 
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
-	NFTMarketKeeper NFTMarketkeeper.Keeper
-
-	NFTAuctionKeeper NFTAuctionkeeper.Keeper
+	AuctionKeeper auctionkeeper.Keeper
 }
 
 func init() {
@@ -244,8 +238,7 @@ func NewNibiruApp(
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey, nfttypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
-		NFTMarkettypes.StoreKey,
-		NFTAuctiontypes.StoreKey,
+		auctiontypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -341,19 +334,12 @@ func NewNibiruApp(
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
-	app.NFTMarketKeeper = *NFTMarketkeeper.NewKeeper(
+	app.AuctionKeeper = *auctionkeeper.NewKeeper(
 		appCodec,
-		keys[NFTMarkettypes.StoreKey],
-		keys[NFTMarkettypes.MemStoreKey],
+		keys[auctiontypes.StoreKey],
+		keys[auctiontypes.MemStoreKey],
 	)
-	NFTMarketModule := NFTMarket.NewAppModule(appCodec, app.NFTMarketKeeper)
-
-	app.NFTAuctionKeeper = *NFTAuctionkeeper.NewKeeper(
-		appCodec,
-		keys[NFTAuctiontypes.StoreKey],
-		keys[NFTAuctiontypes.MemStoreKey],
-	)
-	NFTAuctionModule := NFTAuction.NewAppModule(appCodec, app.NFTAuctionKeeper)
+	auctionModule := auction.NewAppModule(appCodec, app.AuctionKeeper)
 
 	/****  Module Options ****/
 
@@ -393,8 +379,7 @@ func NewNibiruApp(
 		transferModule,
 		nft.NewAppModule(appCodec, app.NFTKeeper, app.AccountKeeper, app.BankKeeper),
 		// this line is used by starport scaffolding # stargate/app/appModule
-		NFTMarketModule,
-		NFTAuctionModule,
+		auctionModule,
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -428,8 +413,7 @@ func NewNibiruApp(
 		ibctransfertypes.ModuleName,
 		nfttypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
-		NFTMarkettypes.ModuleName,
-		NFTAuctiontypes.ModuleName,
+		auctiontypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -672,8 +656,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
-	paramsKeeper.Subspace(NFTMarkettypes.ModuleName)
-	paramsKeeper.Subspace(NFTAuctiontypes.ModuleName)
+	paramsKeeper.Subspace(auctiontypes.ModuleName)
 
 	return paramsKeeper
 }
