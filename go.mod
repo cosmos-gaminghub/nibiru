@@ -8,7 +8,6 @@ require (
 	github.com/cosmos/cosmos-sdk v0.42.5
 	github.com/ethereum/go-ethereum v1.10.3
 	github.com/gogo/protobuf v1.3.3
-	github.com/golang/protobuf v1.5.2
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/ilgooz/openapiconsole v0.0.0-20210521063533-567a97c7c7e9
