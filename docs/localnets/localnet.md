@@ -30,19 +30,19 @@ If you get the following message, you need to specify `--keyring-backend=file`.
 **Add account with tokens to the genesis file**.
 
 ```sh
-$ nibirud add-genesis-account $(nibirud keys show jack -a) 100000000000000quark
+$ nibirud add-genesis-account $(nibirud keys show jack -a) 100000000000000game
 ```
 
-Default denom is `stake`, so if you want to customize the denom(ex:quark, lepton), you have to edit `genesis.json` like below command.
+Default denom is `stake`, so if you want to customize the denom(ex:game), you have to edit `genesis.json` like below command.
 
 ```
-$ sed -i "s/\"stake\"/\"quark\"/g" ~/.nibiru/config/genesis.json
+$ sed -i "s/\"stake\"/\"game\"/g" ~/.nibiru/config/genesis.json
 ```
 
 if you use Mac, then the command should be like this.
 
 ```
-$ sed -i "" "s/\"stake\"/\"quark\"/g" ~/.nibiru/config/genesis.json
+$ sed -i "" "s/\"stake\"/\"game\"/g" ~/.nibiru/config/genesis.json
 ```
 
 **Configure your CLI to eliminate need for chain-id flag**
@@ -63,7 +63,7 @@ Ready for start
 
 ```sh
 # gentx is the create-validator command from genesis state, deciding how much token is self-delegated at the first place.
-$ nibirud gentx jack 50000000000000quark --chain-id=testchain --commission-max-change-rate=0.1 --commission-max-rate=1 --commission-rate=0.1 --moniker=jack-validator
+$ nibirud gentx jack 50000000000000game --chain-id=testchain --commission-max-change-rate=0.1 --commission-max-rate=1 --commission-rate=0.1 --moniker=jack-validator
 $ nibirud collect-gentxs
 $ nibirud validate-genesis
 ```

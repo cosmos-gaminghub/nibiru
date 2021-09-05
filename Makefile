@@ -46,19 +46,20 @@ lint:
 	go mod verify
 
 build:
-	go build $(BUILD_FLAGS) -o build/nbrd ./cmd/nibirud
+	go build $(BUILD_FLAGS) -o build/nibirud ./cmd/nibirud
 
 # make binary for docker
 build-linux: go.sum
-	GOOS=linux GOARCH=amd64 $(MAKE) build
+	LEDGER_ENABLED=false GOOS=linux GOARCH=amd64 $(MAKE) build
 
 # Makefile for the "nbrdnode" docker image.
 build-docker:
 	$(MAKE) -C docker/local
 
 # Run a 4-node testnet locally
+MAKEFILE_DIR:=$(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 localnet-start: build-linux localnet-stop
-	@if ! [ -f build/node0/nbrd/config/genesis.json ]; then docker run --rm -v $(CURDIR)/build:/nbrd:Z cosmos-gaminghub/nbrdnode testnet --v 4 -o . --starting-ip-address 192.168.10.2 ; fi
+	@if ! [ -f build/node0/nibirud/config/genesis.json ]; then docker run --rm -v $(MAKEFILE_DIR)/build:/nibirud:Z cosmos-gaminghub/nibirudnode testnet --v 4 -o . --starting-ip-address 192.168.10.2 --keyring-backend=test; fi
 	docker-compose up -d
 
 # Stop testnet

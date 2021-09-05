@@ -7,6 +7,12 @@
 :::
 
 Firstly, install `golang` from [the official golang donwload page](https://golang.org/dl/).
+
+```sh
+wget https://golang.org/dl/go1.17.linux-amd64.tar.gz
+sudo tar -C /usr/local -xzf [go-file-name]
+```
+
 Be sure to set your `$GOPATH`, `$GOBIN`, and `$PATH` environment variables, for example:
 
 ```sh
@@ -23,7 +29,7 @@ Verify that `golang` has been installed successfully.
 
 ```sh
 $ go version
-go version go1.16.4 linux/amd64
+go version go1.17.1 linux/amd64
 ```
 
 
@@ -36,5 +42,8 @@ cd nibiru && git checkout -b tag0.3 tags/v0.3
 make install
 ```
 
-Try `nbrcli version` and `nbrd version` to verify that everything is fine.
+Try `nibirud version` to verify that everything is fine.
 
+::: tip Tips
+If you are using ubuntu, make sure to install build tools with the command `apt install build-essential` before `make install`.
+:::

@@ -42,3 +42,6 @@ systemctl status nibirud
 ```
 journalctl -f -u nibirud
 ```
+::: tip Tips
+If you find the message: `No journal files were found.`, then you need to restart journalctl with the command `systemctl restart systemd-journald`
+:::
