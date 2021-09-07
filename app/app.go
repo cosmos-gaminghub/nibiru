@@ -92,10 +92,6 @@ import (
 	nftmoduletypes "github.com/cosmos-gaminghub/nibiru/x/nft/types"
 	"github.com/tendermint/spm-extras/wasmcmd"
 
-	"github.com/irisnet/irismod/modules/nft"
-	nftkeeper "github.com/irisnet/irismod/modules/nft/keeper"
-	nfttypes "github.com/irisnet/irismod/modules/nft/types"
-
 	// unnamed import of statik for swagger UI support
 	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
 )
@@ -155,7 +151,6 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
-		nft.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 		nftmodule.AppModuleBasic{},
 		wasm.AppModuleBasic{},
@@ -232,8 +227,6 @@ type NibiruApp struct { // nolint: golint
 
 	// simulation manager
 	sm *module.SimulationManager
-
-	NFTKeeper nftkeeper.Keeper
 }
 
 func init() {
@@ -264,7 +257,7 @@ func NewNibiruApp(
 		authtypes.StoreKey, banktypes.StoreKey, stakingtypes.StoreKey,
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
-		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey, nfttypes.StoreKey,
+		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 		nftmoduletypes.StoreKey,
 		wasm.StoreKey,
@@ -351,6 +344,7 @@ func NewNibiruApp(
 	)
 	transferModule := transfer.NewAppModule(app.TransferKeeper)
 
+	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 	app.NftKeeper = *nftmodulekeeper.NewKeeper(
 		appCodec,
 		keys[nftmoduletypes.StoreKey],
@@ -361,7 +355,6 @@ func NewNibiruApp(
 	)
 	nftModule := nftmodule.NewAppModule(appCodec, app.NftKeeper)
 
-	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 	wasmDir := filepath.Join(homePath, "wasm")
 
 	wasmConfig, err := wasm.ReadWasmConfig(appOpts)
@@ -419,8 +412,6 @@ func NewNibiruApp(
 		skipGenesisInvariants = opt
 	}
 
-	app.NFTKeeper = nftkeeper.NewKeeper(appCodec, keys[nfttypes.StoreKey])
-
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.
 
@@ -446,7 +437,6 @@ func NewNibiruApp(
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
-		nft.NewAppModule(appCodec, app.NFTKeeper, app.AccountKeeper, app.BankKeeper),
 		// this line is used by starport scaffolding # stargate/app/appModule
 		nftModule,
 		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper),
@@ -481,7 +471,6 @@ func NewNibiruApp(
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
-		nfttypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 		nftmoduletypes.ModuleName,
 		wasm.ModuleName,
@@ -508,7 +497,6 @@ func NewNibiruApp(
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
-		nft.NewAppModule(appCodec, app.NFTKeeper, app.AccountKeeper, app.BankKeeper),
 	)
 
 	app.sm.RegisterStoreDecoders()
