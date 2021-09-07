@@ -34,7 +34,7 @@ If your node is sync fully, then you can run the following command to upgrade yo
 
 :::tip testnet faucet
 You need some $GAME as Gus to send a tx.
-Please ask in [the Discord validator channel](discord.gg/VfvTCP7Rm2) for faucet token with your address starting `nibiru`.
+Please ask in [the Discord validator channel](discord.gg/VfvTCP7Rm2) for faucet token with your address starting `nibiru1`.
 :::
 
 ```sh
@@ -59,8 +59,8 @@ If you got an error that implys insufficient gas, then you can modify `--gas="au
 :::
 
 
-### TODO:update explorer description
-Check [Cosmos Gaming Hub Explorer](https://nibiru.cosmosgamingexplorer.com/) to see if your node in validator set correctly.
+### Block Explorer
+Check [GAME Explorer](https://nibiru-2000.game-explorer.io/) to see if your node in validator set correctly.
 
 
 ## Edit Validator

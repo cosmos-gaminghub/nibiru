@@ -12,7 +12,7 @@ nibirud init <your_moniker> --chain-id=nibiru-2000
 
 After that command, you can confirm that `.nibirud` folder is created in your home directory.
 
-## GenTx Collection ( Until August 28, 2021 11:00 GMT)
+## GenTx Collection (to join from genesis)
 1. Initialize the nibiru directories and create the local file with the correct chain-id
 
 ```
@@ -36,11 +36,11 @@ nibirud gentx <your key name> 100000000000game --commission-rate=0.1 --commissio
 
 5. Create Pull Request to [the testnet repo](https://github.com/cosmos-gaminghub/testnets).
 
-## Genesis file ( From August 28, 2021 11:00 GMT)
+## Genesis file
 Nibiru testnets genesis file is in [testnets repo](https://github.com/cosmos-gaminghub/testnets).
 Download the latest genesis file by running the following command.
 ```sh
-curl -o $HOME/.nibirud/config/genesis.json https://raw.githubusercontent.com/cosmos-gaminghub/testnets/master/latest/genesis.json
+curl -o $HOME/.nibiru/config/genesis.json https://raw.githubusercontent.com/cosmos-gaminghub/testnets/master/latest/genesis.json
 ```
 
 
@@ -49,7 +49,7 @@ To connect other nodes running in the network, you have to set the seed nodes in
 Open the `config.toml` file with vim editor, for example.
 
 ```sh
-vim $HOME/.nibirud/config/config.toml
+vim $HOME/.nibiru/config/config.toml
 ```
 
 ```config.toml
