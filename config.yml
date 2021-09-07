@@ -3,11 +3,18 @@ accounts:
     coins: ["1000token", "100000000stake"]
   - name: bob
     coins: ["500token"]
+  - name: faucet
+    coins: ["100000000token"]
 validator:
   name: alice
   staked: "100000000stake"
-# client:
+client:
+  openapi:
+    path: "docs/static/openapi.yml"
 #   vuex:
 #     path: "vue/src/store"
 build:
   binary: "nbrd"
+faucet:
+  name: faucet
+  coins: ["100token"]
