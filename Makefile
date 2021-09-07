@@ -29,6 +29,8 @@ ldflags := $(strip $(ldflags))
 
 BUILD_FLAGS := -tags "$(build_tags)" -ldflags '$(ldflags)'
 
+PACKAGES=$(shell go list ./... | grep -v '/simulation')
+
 #### Command List ####
 
 all: lint install
@@ -69,3 +71,5 @@ localnet-stop:
 fmt:
 	gofmt -w -l .
 
+test:
+	@go test -mod=readonly $(PACKAGES)
