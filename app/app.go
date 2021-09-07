@@ -87,6 +87,9 @@ import (
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmclient "github.com/CosmWasm/wasmd/x/wasm/client"
+	nftmodule "github.com/cosmos-gaminghub/nibiru/x/nft"
+	nftmodulekeeper "github.com/cosmos-gaminghub/nibiru/x/nft/keeper"
+	nftmoduletypes "github.com/cosmos-gaminghub/nibiru/x/nft/types"
 	"github.com/tendermint/spm-extras/wasmcmd"
 
 	// unnamed import of statik for swagger UI support
@@ -149,6 +152,7 @@ var (
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
+		nftmodule.AppModuleBasic{},
 		wasm.AppModuleBasic{},
 	)
 
@@ -162,6 +166,7 @@ var (
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		// this line is used by starport scaffolding # stargate/app/maccPerms
+		nftmoduletypes.ModuleName: {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 	}
 
 	// module accounts that are allowed to receive tokens
@@ -212,6 +217,8 @@ type NibiruApp struct { // nolint: golint
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
+
+	NftKeeper        nftmodulekeeper.Keeper
 	wasmKeeper       wasm.Keeper
 	scopedWasmKeeper capabilitykeeper.ScopedKeeper
 
@@ -252,6 +259,7 @@ func NewNibiruApp(
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
+		nftmoduletypes.StoreKey,
 		wasm.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -336,6 +344,16 @@ func NewNibiruApp(
 	)
 	transferModule := transfer.NewAppModule(app.TransferKeeper)
 
+	app.NftKeeper = *nftmodulekeeper.NewKeeper(
+		appCodec,
+		keys[nftmoduletypes.StoreKey],
+		keys[nftmoduletypes.MemStoreKey],
+
+		app.AccountKeeper,
+		app.BankKeeper,
+	)
+	nftModule := nftmodule.NewAppModule(appCodec, app.NftKeeper)
+
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 	wasmDir := filepath.Join(homePath, "wasm")
 
@@ -419,6 +437,7 @@ func NewNibiruApp(
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
+		nftModule,
 		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper),
 	)
 
@@ -442,6 +461,7 @@ func NewNibiruApp(
 		slashingtypes.ModuleName, govtypes.ModuleName, minttypes.ModuleName, crisistypes.ModuleName,
 		ibchost.ModuleName, genutiltypes.ModuleName, evidencetypes.ModuleName, ibctransfertypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
+		nftmoduletypes.ModuleName,
 		wasm.ModuleName,
 	)
 
@@ -687,6 +707,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
+	paramsKeeper.Subspace(nftmoduletypes.ModuleName)
 	paramsKeeper.Subspace(wasm.ModuleName)
 
 	return paramsKeeper
