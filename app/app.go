@@ -95,10 +95,6 @@ import (
 
 	// unnamed import of statik for swagger UI support
 	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
-	// this line is used by starport scaffolding # stargate/app/moduleImport
-	"github.com/cosmos-gaminghub/nibiru/x/auction"
-	auctionkeeper "github.com/cosmos-gaminghub/nibiru/x/auction/keeper"
-	auctiontypes "github.com/cosmos-gaminghub/nibiru/x/auction/types"
 )
 
 const (
@@ -158,7 +154,6 @@ var (
 		vesting.AppModuleBasic{},
 		nft.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
-		auction.AppModuleBasic{},
 		wasm.AppModuleBasic{},
 	)
 
@@ -232,10 +227,6 @@ type NibiruApp struct { // nolint: golint
 	sm *module.SimulationManager
 
 	NFTKeeper nftkeeper.Keeper
-
-	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
-
-	AuctionKeeper auctionkeeper.Keeper
 }
 
 func init() {
@@ -268,7 +259,7 @@ func NewNibiruApp(
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey, nfttypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
-		auctiontypes.StoreKey, wasm.StoreKey,
+		wasm.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -401,15 +392,6 @@ func NewNibiruApp(
 	// If evidence needs to be handled for the app, set routes in router here and seal
 	app.EvidenceKeeper = *evidenceKeeper
 
-	// this line is used by starport scaffolding # stargate/app/keeperDefinition
-
-	app.AuctionKeeper = *auctionkeeper.NewKeeper(
-		appCodec,
-		keys[auctiontypes.StoreKey],
-		keys[auctiontypes.MemStoreKey],
-	)
-	auctionModule := auction.NewAppModule(appCodec, app.AuctionKeeper)
-
 	/****  Module Options ****/
 
 	/****  Module Options ****/
@@ -448,7 +430,6 @@ func NewNibiruApp(
 		transferModule,
 		nft.NewAppModule(appCodec, app.NFTKeeper, app.AccountKeeper, app.BankKeeper),
 		// this line is used by starport scaffolding # stargate/app/appModule
-		auctionModule,
 		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper),
 	)
 
@@ -483,7 +464,6 @@ func NewNibiruApp(
 		ibctransfertypes.ModuleName,
 		nfttypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
-		auctiontypes.ModuleName,
 		wasm.ModuleName,
 	)
 
@@ -730,7 +710,6 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
-	paramsKeeper.Subspace(auctiontypes.ModuleName)
 	paramsKeeper.Subspace(wasm.ModuleName)
 
 	return paramsKeeper
