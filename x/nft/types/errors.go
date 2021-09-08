@@ -8,6 +8,6 @@ import (
 
 // x/nft module sentinel errors
 var (
-	ErrSample = sdkerrors.Register(ModuleName, 1100, "sample error")
+	ErrRestricted = sdkerrors.Register(ModuleName, 1, "restricted")
 	// this line is used by starport scaffolding # ibc/errors
 )

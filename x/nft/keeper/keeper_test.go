@@ -40,11 +40,53 @@ func setupKeeper(t testing.TB) (*Keeper, sdk.Context) {
 	return keeper, ctx
 }
 
-func TestEdit(t *testing.T) {
-	keeper, ctx := setupKeeper(t)
+func TestGetNFTn(t *testing.T) {
 	var (
+		keeper, ctx = setupKeeper(t)
+		denomID     = "denom-id"
+		owner       = testutil.CreateTestAddrs(1)[0]
+		err         error
+	)
+	err = keeper.IssueDenom(ctx, denomID, "name", "schema", owner)
+	require.NoError(t, err)
+	tokenID, err := keeper.MintNFTn(ctx, denomID, "name", "token-uri", "data", owner)
+	require.NoError(t, err)
+
+	_, err = keeper.GetNFTn(ctx, denomID, tokenID)
+	require.NoError(t, err)
+}
+
+func TestGetNFT(t *testing.T) {
+	keeper, ctx := setupKeeper(t)
+	_, err := keeper.GetNFT(ctx, "denomID", "tokenID")
+	require.ErrorIs(t, err, types.ErrRestricted)
+}
+
+func TestMintNFTn(t *testing.T) {
+	var (
+		keeper, ctx = setupKeeper(t)
+		denomID     = "denom-id"
+		owner       = testutil.CreateTestAddrs(1)[0]
+		err         error
+	)
+	err = keeper.IssueDenom(ctx, denomID, "name", "schema", owner)
+	require.NoError(t, err)
+
+	tokenID, err := keeper.MintNFTn(ctx, denomID, "name", "token-uri", "data", owner)
+	require.NoError(t, err)
+	require.Equal(t, keeper.GetNFTCount(ctx, denomID), tokenID)
+}
+
+func TestMintNFT(t *testing.T) {
+	keeper, ctx := setupKeeper(t)
+	err := keeper.MintNFT(ctx, "denomID", "tokenID", "nm", "uri", "data", testutil.CreateTestAddrs(1)[0])
+	require.ErrorIs(t, err, types.ErrRestricted)
+}
+
+func TestEditNFTn(t *testing.T) {
+	var (
+		keeper, ctx  = setupKeeper(t)
 		denomID      = "denom-id"
-		tokenID      = "token-id"
 		tokenURI     = "token-uri"
 		newTokenData = "new-token-data"
 		testAddrs    = testutil.CreateTestAddrs(2)
@@ -56,12 +98,12 @@ func TestEdit(t *testing.T) {
 	err = keeper.IssueDenom(ctx, denomID, "name", "schema", denomCreator)
 	require.NoError(t, err)
 
-	err = keeper.MintNFT(ctx, denomID, tokenID, "name", tokenURI, "data", nftOwner)
+	tokenID, err := keeper.MintNFTn(ctx, denomID, "name", tokenURI, "data", nftOwner)
 	require.NoError(t, err)
 
 	type args struct {
 		denomID string
-		tokenID string
+		tokenID uint64
 		nm      string
 		uri     string
 		data    string
@@ -78,7 +120,7 @@ func TestEdit(t *testing.T) {
 			desc: "not found nft by invalid denomID",
 			args: args{
 				denomID: "invalid-denomID",
-				tokenID: "",
+				tokenID: tokenID,
 				nm:      "",
 				uri:     "",
 				data:    "",
@@ -90,7 +132,7 @@ func TestEdit(t *testing.T) {
 			desc: "not found nft by invalid tokenID",
 			args: args{
 				denomID: denomID,
-				tokenID: "invalid-tokenID",
+				tokenID: 0,
 				nm:      "",
 				uri:     "",
 				data:    "",
@@ -124,15 +166,21 @@ func TestEdit(t *testing.T) {
 		},
 	} {
 		t.Run(tc.desc, func(t *testing.T) {
-			err = keeper.EditNFT(ctx, tc.args.denomID, tc.args.tokenID, tc.args.nm, tc.args.uri, tc.args.data, tc.args.owner)
+			err = keeper.EditNFTn(ctx, tc.args.denomID, tc.args.tokenID, tc.args.nm, tc.args.uri, tc.args.data, tc.args.owner)
 			if tc.err != nil {
 				require.ErrorIs(t, err, tc.err)
 			} else {
 				require.NoError(t, err)
-				nft, err := keeper.GetNFT(ctx, tc.args.denomID, tc.args.tokenID)
+				nft, err := keeper.GetNFTn(ctx, tc.args.denomID, tc.args.tokenID)
 				require.NoError(t, err)
 				require.Equal(t, tc.expectedTokenData, nft.GetData())
 			}
 		})
 	}
+}
+
+func TestEditNFT(t *testing.T) {
+	keeper, ctx := setupKeeper(t)
+	err := keeper.EditNFT(ctx, "denomID", "tokenID", "nm", "uri", "data", testutil.CreateTestAddrs(1)[0])
+	require.ErrorIs(t, err, types.ErrRestricted)
 }
