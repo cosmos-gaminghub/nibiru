@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/CosmWasm/wasmd/x/wasm"
 	nibiru "github.com/cosmos-gaminghub/nibiru/app"
 	"github.com/cosmos-gaminghub/nibiru/app/params"
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -29,6 +30,7 @@ import (
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"github.com/tendermint/spm-extras/wasmcmd"
 	tmcli "github.com/tendermint/tendermint/libs/cli"
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
@@ -83,6 +85,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		tmcli.NewCompletionCmd(rootCmd, true),
 		testnetCmd(nibiru.ModuleBasics, banktypes.GenesisBalancesIterator{}),
 		debug.Cmd(),
+		wasmcmd.GenesisWasmMsgCmd(nibiru.DefaultNodeHome),
 	)
 
 	a := appCreator{encodingConfig}
@@ -98,6 +101,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 }
 func addModuleInitFlags(startCmd *cobra.Command) {
 	crisis.AddModuleInitFlags(startCmd)
+	wasm.AddModuleInitFlags(startCmd)
 }
 
 func queryCommand() *cobra.Command {
