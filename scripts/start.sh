@@ -20,7 +20,7 @@ $DAEMON keys add jack
 # Add both accounts, with coins to the genesis file
 $DAEMON add-genesis-account $($DAEMON keys show jack -a) 100000000000000$TOKEN_DENOM
 
-$DAEMON gentx $NETWORK 10000000000000$TOKEN_DENOM --commission-rate=0.1 --commission-max-rate=1 --commission-max-change-rate=0.1 --pubkey $($DAEMON tendermint show-validator) --chain-id=$NETWORK
+$DAEMON gentx jack 10000000000000$TOKEN_DENOM --commission-rate=0.1 --commission-max-rate=1 --commission-max-change-rate=0.1 --pubkey $($DAEMON tendermint show-validator) --chain-id=$NETWORK
 
 $DAEMON collect-gentxs
 
