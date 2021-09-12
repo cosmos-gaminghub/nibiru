@@ -73,3 +73,6 @@ fmt:
 
 test:
 	@go test -mod=readonly $(PACKAGES)
+
+protogen:
+	starport generate proto-go
