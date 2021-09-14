@@ -111,11 +111,11 @@ func (msg MsgMintNFT) GetSigners() []sdk.AccAddress {
 
 // NewMsgEditNFT is a constructor function for MsgSetName
 func NewMsgEditNFT(
-	tokenID, denomID uint64, tokenName, tokenData, sender string,
+	denomID, tokenID uint64, tokenName, tokenData, sender string,
 ) *MsgEditNFT {
 	return &MsgEditNFT{
-		Id:      tokenID,
 		DenomId: denomID,
+		Id:      tokenID,
 		Name:    tokenName,
 		Data:    tokenData,
 		Sender:  sender,

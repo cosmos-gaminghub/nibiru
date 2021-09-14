@@ -2,175 +2,109 @@ package keeper
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/cosmos-gaminghub/nibiru/x/nft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	irismodkeeper "github.com/irisnet/irismod/modules/nft/keeper"
 	irismodtypes "github.com/irisnet/irismod/modules/nft/types"
 )
 
 type msgServer struct {
 	Keeper
+	irisServer irismodtypes.MsgServer
 }
 
 // NewMsgServerImpl returns an implementation of the MsgServer interface
 // for the provided Keeper.
 func NewMsgServerImpl(keeper Keeper) types.MsgServer {
-	return &msgServer{Keeper: keeper}
+	return &msgServer{
+		Keeper:     keeper,
+		irisServer: irismodkeeper.NewMsgServerImpl(keeper.irisKeeper),
+	}
 }
 
 var _ types.MsgServer = msgServer{}
 
 // IssueDenom issue a new denom.
 func (m msgServer) IssueDenom(goCtx context.Context, msg *types.MsgIssueDenom) (*types.MsgIssueDenomResponse, error) {
-	sender, err := sdk.AccAddressFromBech32(msg.Sender)
-	if err != nil {
-		return nil, err
-	}
-
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	denomID, err := m.Keeper.IssueDenomn(ctx, msg.Name, msg.Schema, sender)
+	irisMsg, err := m.Keeper.toIrisMsgIssueDenom(ctx, msg)
 	if err != nil {
 		return nil, err
 	}
 
-	ctx.EventManager().EmitEvents(sdk.Events{
-		sdk.NewEvent(
-			irismodtypes.EventTypeIssueDenom,
-			sdk.NewAttribute(irismodtypes.AttributeKeyDenomID, fmt.Sprintf("%d", denomID)),
-			sdk.NewAttribute(irismodtypes.AttributeKeyDenomName, msg.Name),
-			sdk.NewAttribute(irismodtypes.AttributeKeyCreator, msg.Sender),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, irismodtypes.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
-		),
-	})
+	_, err = m.irisServer.IssueDenom(goCtx, irisMsg)
+	if err != nil {
+		return nil, err
+	}
+
+	denomID, _ := types.ToDenomID(irisMsg.Id)
 
 	return &types.MsgIssueDenomResponse{
-		Id: denomID,
+		Id: denomID.Uint64(),
 	}, nil
 }
 
 func (m msgServer) MintNFT(goCtx context.Context, msg *types.MsgMintNFT) (*types.MsgMintNFTResponse, error) {
-	recipient, err := sdk.AccAddressFromBech32(msg.Recipient)
-	if err != nil {
-		return nil, err
-	}
-
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	tokenID, err := m.Keeper.MintNFTn(ctx, msg.DenomId, msg.Name, msg.URI, msg.Data, recipient)
+	irisMsg, err := m.Keeper.toIrisMsgMintNFT(ctx, msg)
 	if err != nil {
 		return nil, err
 	}
 
-	ctx.EventManager().EmitEvents(sdk.Events{
-		sdk.NewEvent(
-			irismodtypes.EventTypeMintNFT,
-			sdk.NewAttribute(irismodtypes.AttributeKeyDenomID, fmt.Sprintf("%d", msg.DenomId)),
-			sdk.NewAttribute(irismodtypes.AttributeKeyTokenID, fmt.Sprintf("%d", tokenID)),
-			sdk.NewAttribute(irismodtypes.AttributeKeyTokenURI, msg.URI),
-			sdk.NewAttribute(irismodtypes.AttributeKeyRecipient, msg.Recipient),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, irismodtypes.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
-		),
-	})
+	_, err = m.irisServer.MintNFT(goCtx, irisMsg)
+	if err != nil {
+		return nil, err
+	}
+
+	tokenID, _ := types.ToTokenID(irisMsg.Id)
 
 	return &types.MsgMintNFTResponse{
-		Id: tokenID,
+		Id: tokenID.Uint64(),
 	}, nil
 }
 
 func (m msgServer) EditNFT(goCtx context.Context, msg *types.MsgEditNFT) (*types.MsgEditNFTResponse, error) {
-	sender, err := sdk.AccAddressFromBech32(msg.Sender)
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	irisMsg, err := m.Keeper.toIrisMsgEditNFT(ctx, msg)
 	if err != nil {
 		return nil, err
 	}
 
-	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err := m.Keeper.EditNFTn(ctx, msg.DenomId, msg.Id, msg.Name, msg.Data, sender); err != nil {
+	_, err = m.irisServer.EditNFT(goCtx, irisMsg)
+	if err != nil {
 		return nil, err
 	}
-
-	ctx.EventManager().EmitEvents(sdk.Events{
-		sdk.NewEvent(
-			irismodtypes.EventTypeEditNFT,
-			sdk.NewAttribute(irismodtypes.AttributeKeyDenomID, fmt.Sprintf("%d", msg.DenomId)),
-			sdk.NewAttribute(irismodtypes.AttributeKeyTokenID, fmt.Sprintf("%d", msg.Id)),
-			sdk.NewAttribute(irismodtypes.AttributeKeyOwner, msg.Sender),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, irismodtypes.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
-		),
-	})
 
 	return &types.MsgEditNFTResponse{}, nil
 }
 
 func (m msgServer) TransferNFT(goCtx context.Context, msg *types.MsgTransferNFT) (*types.MsgTransferNFTResponse, error) {
-	sender, err := sdk.AccAddressFromBech32(msg.Sender)
-	if err != nil {
-		return nil, err
-	}
-
-	recipient, err := sdk.AccAddressFromBech32(msg.Recipient)
-	if err != nil {
-		return nil, err
-	}
-
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err := m.Keeper.TransferOwnern(ctx, msg.DenomId, msg.Id, sender, recipient); err != nil {
+	irisMsg, err := m.Keeper.toIrisMsgTransferNFT(ctx, msg)
+	if err != nil {
 		return nil, err
 	}
 
-	ctx.EventManager().EmitEvents(sdk.Events{
-		sdk.NewEvent(
-			irismodtypes.EventTypeTransfer,
-			sdk.NewAttribute(irismodtypes.AttributeKeyDenomID, fmt.Sprintf("%d", msg.DenomId)),
-			sdk.NewAttribute(irismodtypes.AttributeKeyTokenID, fmt.Sprintf("%d", msg.Id)),
-			sdk.NewAttribute(irismodtypes.AttributeKeySender, msg.Sender),
-			sdk.NewAttribute(irismodtypes.AttributeKeyRecipient, msg.Recipient),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, irismodtypes.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
-		),
-	})
+	_, err = m.irisServer.TransferNFT(goCtx, irisMsg)
+	if err != nil {
+		return nil, err
+	}
 
 	return &types.MsgTransferNFTResponse{}, nil
 }
 
 func (m msgServer) BurnNFT(goCtx context.Context, msg *types.MsgBurnNFT) (*types.MsgBurnNFTResponse, error) {
-	sender, err := sdk.AccAddressFromBech32(msg.Sender)
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	irisMsg, err := m.Keeper.toIrisMsgBurnNFT(ctx, msg)
 	if err != nil {
 		return nil, err
 	}
 
-	ctx := sdk.UnwrapSDKContext(goCtx)
-	if err := m.Keeper.BurnNFTn(ctx, msg.DenomId, msg.Id, sender); err != nil {
+	_, err = m.irisServer.BurnNFT(goCtx, irisMsg)
+	if err != nil {
 		return nil, err
 	}
-
-	ctx.EventManager().EmitEvents(sdk.Events{
-		sdk.NewEvent(
-			irismodtypes.EventTypeBurnNFT,
-			sdk.NewAttribute(irismodtypes.AttributeKeyDenomID, fmt.Sprintf("%d", msg.DenomId)),
-			sdk.NewAttribute(irismodtypes.AttributeKeyTokenID, fmt.Sprintf("%d", msg.Id)),
-			sdk.NewAttribute(irismodtypes.AttributeKeyOwner, msg.Sender),
-		),
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, irismodtypes.AttributeValueCategory),
-			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
-		),
-	})
 
 	return &types.MsgBurnNFTResponse{}, nil
 }

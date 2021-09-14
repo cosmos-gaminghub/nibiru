@@ -21,7 +21,7 @@ type (
 		storeKey sdk.StoreKey
 		memKey   sdk.StoreKey
 
-		irismodkeeper.Keeper
+		irisKeeper irismodkeeper.Keeper
 		// this line is used by starport scaffolding # ibc/keeper/attribute
 
 		accountKeeper types.AccountKeeper
@@ -37,10 +37,10 @@ func NewKeeper(
 	accountKeeper types.AccountKeeper, bankKeeper types.BankKeeper,
 ) *Keeper {
 	return &Keeper{
-		cdc:      cdc,
-		storeKey: storeKey,
-		memKey:   memKey,
-		Keeper:   irismodkeeper.NewKeeper(cdc, storeKey),
+		cdc:        cdc,
+		storeKey:   storeKey,
+		memKey:     memKey,
+		irisKeeper: irismodkeeper.NewKeeper(cdc, storeKey),
 		// this line is used by starport scaffolding # ibc/keeper/return
 		accountKeeper: accountKeeper, bankKeeper: bankKeeper,
 	}
@@ -50,125 +50,121 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
-func (k Keeper) irisKeeper() irismodkeeper.Keeper {
-	return k.Keeper
+func (k Keeper) NewDenomID(ctx sdk.Context) types.DenomID {
+	return types.DenomID(k.GetDenomCount(ctx) + types.MIN_DENOM_ID)
+}
+
+func (k Keeper) NewTokenID(ctx sdk.Context, denomID uint64) (tokenID types.TokenID, err error) {
+	if !k.irisKeeper.HasDenomID(ctx, types.DenomID(denomID).String()) {
+		err = sdkerrors.Wrapf(irismodtypes.ErrInvalidDenom, "denom ID %s not exists", types.DenomID(denomID).String())
+		return
+	}
+
+	tokenID = types.TokenID(k.GetNFTCount(ctx, denomID) + types.MIN_TOKEN_ID)
+	return
 }
 
 func (k Keeper) GetDenomCount(ctx sdk.Context) uint64 {
-	return uint64(len(k.GetDenoms(ctx)))
+	return uint64(len(k.irisKeeper.GetDenoms(ctx)))
 }
 
 func (k Keeper) GetNFTCount(ctx sdk.Context, denomID uint64) uint64 {
-	return uint64(len(k.GetNFTs(ctx, fmt.Sprintf("%d", denomID))))
+	return uint64(len(k.irisKeeper.GetNFTs(ctx, types.DenomID(denomID).String())))
 }
 
-// IssueDenomn issues a denom according to the given params
-func (k Keeper) IssueDenomn(ctx sdk.Context,
-	name, schema string, creator sdk.AccAddress) (uint64, error) {
-	count := k.GetDenomCount(ctx)
-	// must longer thant 3 length
-	count += 100
-	err := k.irisKeeper().IssueDenom(ctx, fmt.Sprintf("%d", count), name, schema, creator)
-	return count, err
+// GetNFT gets the the specified NFT
+func (k Keeper) GetNFT(ctx sdk.Context, denomID, tokenID uint64) (irismodexported.NFT, error) {
+	return k.irisKeeper.GetNFT(ctx, types.DenomID(denomID).String(), types.TokenID(tokenID).String())
 }
 
-// IssueDenom return error
-// Override irismod, restricting using this function
-func (k Keeper) IssueDenom(ctx sdk.Context,
-	id, name, schema string,
-	creator sdk.AccAddress) error {
-	return sdkerrors.Wrap(types.ErrRestricted, "please use another IssueDenomn function")
-}
-
-// GetNFTn gets the the specified NFT
-func (k Keeper) GetNFTn(ctx sdk.Context, denomID, tokenID uint64) (irismodexported.NFT, error) {
-	return k.irisKeeper().GetNFT(ctx, fmt.Sprintf("%d", denomID), fmt.Sprintf("%d", tokenID))
-}
-
-// GetNFT return error
-// Override irismod, restricting using this function
-func (k Keeper) GetNFT(ctx sdk.Context, denomID, tokenID string) (nft irismodexported.NFT, err error) {
-	err = sdkerrors.Wrap(types.ErrRestricted, "please use another GetNFTn function")
-	return
-}
-
-// MintNFTn mints an NFT and manages the NFT's existence within Collections and Owners
-func (k Keeper) MintNFTn(
-	ctx sdk.Context, denomID uint64, tokenNm,
-	tokenURI, tokenData string, owner sdk.AccAddress,
-) (count uint64, err error) {
-	denomIDStr := fmt.Sprintf("%d", denomID)
-	if !k.HasDenomID(ctx, denomIDStr) {
-		err = sdkerrors.Wrapf(irismodtypes.ErrInvalidDenom, "denom ID %d not exists", denomID)
-		return
+// IssueDeno issues a denom according to the given params
+func (k Keeper) IssueDenom(ctx sdk.Context, msg *types.MsgIssueDenom) (uint64, error) {
+	irisMsg, err := k.toIrisMsgIssueDenom(ctx, msg)
+	if err != nil {
+		return 0, err
 	}
-	count = k.GetNFTCount(ctx, denomID)
-	// must longer thant 3 length
-	count += 100
-	k.irisKeeper().MintNFT(ctx, denomIDStr, fmt.Sprintf("%d", count), tokenNm, tokenURI, tokenData, owner)
 
-	return
+	creator, err := sdk.AccAddressFromBech32(irisMsg.Sender)
+	if err != nil {
+		return 0, err
+	}
+
+	if err = k.irisKeeper.IssueDenom(ctx, irisMsg.Id, irisMsg.Name, irisMsg.Schema, creator); err != nil {
+		return 0, err
+	}
+
+	denomID, _ := types.ToDenomID(irisMsg.Id)
+
+	return denomID.Uint64(), nil
 }
 
-// MintNFT return error
-// Override irismod, restricting using this function
-func (k Keeper) MintNFT(
-	ctx sdk.Context, denomID, tokenID, tokenNm,
-	tokenURI, tokenData string, owner sdk.AccAddress,
-) error {
-	return sdkerrors.Wrap(types.ErrRestricted, "please use another MintNFTn function")
+// MintNFT mints an NFT and manages the NFT's existence within Collections and Owners
+func (k Keeper) MintNFT(ctx sdk.Context, msg *types.MsgMintNFT) (uint64, error) {
+	irisMsg, err := k.toIrisMsgMintNFT(ctx, msg)
+	if err != nil {
+		return 0, err
+	}
+
+	receipent, err := sdk.AccAddressFromBech32(irisMsg.Recipient)
+	if err != nil {
+		return 0, err
+	}
+
+	if err = k.irisKeeper.MintNFT(ctx, irisMsg.DenomId, irisMsg.Id, irisMsg.Name, irisMsg.URI, irisMsg.Data, receipent); err != nil {
+		return 0, err
+	}
+
+	tokenID, _ := types.ToTokenID(irisMsg.Id)
+
+	return tokenID.Uint64(), nil
 }
 
-// EditNFTn updates an already existing NFT
-// Override irismod, restrict changing token URI
-func (k Keeper) EditNFTn(
-	ctx sdk.Context, denomID, tokenID uint64, tokenNm, tokenData string, owner sdk.AccAddress,
-) error {
-	nft, err := k.GetNFTn(ctx, denomID, tokenID)
+// EditNFT updates an already existing NFT
+func (k Keeper) EditNFT(ctx sdk.Context, msg *types.MsgEditNFT) error {
+	irisMsg, err := k.toIrisMsgEditNFT(ctx, msg)
 	if err != nil {
 		return err
 	}
 
-	return k.irisKeeper().EditNFT(ctx, fmt.Sprintf("%d", denomID), fmt.Sprintf("%d", tokenID), tokenNm, nft.GetURI(), tokenData, owner)
-}
-
-// EditNFT return error
-// Override irismod, restricting using this function
-func (k Keeper) EditNFT(
-	ctx sdk.Context, denomID, tokenID, tokenNm,
-	tokenURI, tokenData string, owner sdk.AccAddress,
-) error {
-	return sdkerrors.Wrap(types.ErrRestricted, "please use another EditNFTn function")
-}
-
-// TransferOwnern transfers the ownership of the given NFT to the new owner
-func (k Keeper) TransferOwnern(
-	ctx sdk.Context, denomID, tokenID uint64, srcOwner, dstOwner sdk.AccAddress,
-) error {
-	nft, err := k.GetNFTn(ctx, denomID, tokenID)
+	owner, err := sdk.AccAddressFromBech32(irisMsg.Sender)
 	if err != nil {
 		return err
 	}
 
-	return k.irisKeeper().TransferOwner(ctx, fmt.Sprintf("%d", denomID), fmt.Sprintf("%d", tokenID), nft.GetName(), nft.GetURI(), nft.GetData(), srcOwner, dstOwner)
+	return k.irisKeeper.EditNFT(ctx, irisMsg.DenomId, irisMsg.Id, irisMsg.Name, irisMsg.URI, irisMsg.Data, owner)
 }
 
-// TransferOwner return error
-// Override irismod, restricting using this function
-func (k Keeper) TransferOwner(
-	ctx sdk.Context, denomID, tokenID, tokenNm, tokenURI,
-	tokenData string, srcOwner, dstOwner sdk.AccAddress,
-) error {
-	return sdkerrors.Wrap(types.ErrRestricted, "please use another TransferOwnern function")
+// TransferNFT transfers the ownership of the given NFT to the new owner
+func (k Keeper) TransferNFT(ctx sdk.Context, msg *types.MsgTransferNFT) error {
+	irisMsg, err := k.toIrisMsgTransferNFT(ctx, msg)
+	if err != nil {
+		return err
+	}
+
+	owner, err := sdk.AccAddressFromBech32(irisMsg.Sender)
+	if err != nil {
+		return err
+	}
+
+	receipent, err := sdk.AccAddressFromBech32(irisMsg.Recipient)
+	if err != nil {
+		return err
+	}
+
+	return k.irisKeeper.TransferOwner(ctx, irisMsg.DenomId, irisMsg.Id, irisMsg.Name, irisMsg.URI, irisMsg.Data, owner, receipent)
 }
 
-// BurnNFTn deletes a specified NFT
-func (k Keeper) BurnNFTn(ctx sdk.Context, denomID, tokenID uint64, owner sdk.AccAddress) error {
-	return k.irisKeeper().BurnNFT(ctx, fmt.Sprintf("%d", denomID), fmt.Sprintf("%d", tokenID), owner)
-}
+// BurnNFT deletes a specified NFT
+func (k Keeper) BurnNFT(ctx sdk.Context, msg *types.MsgBurnNFT) error {
+	irisMsg, err := k.toIrisMsgBurnNFT(ctx, msg)
+	if err != nil {
+		return err
+	}
 
-// BurnNFT return error
-// Override irismod, restricting using this function
-func (k Keeper) BurnNFT(ctx sdk.Context, denomID, tokenID string, owner sdk.AccAddress) error {
-	return sdkerrors.Wrap(types.ErrRestricted, "please use another BurnNFTn function")
+	owner, err := sdk.AccAddressFromBech32(irisMsg.Sender)
+	if err != nil {
+		return err
+	}
+
+	return k.irisKeeper.BurnNFT(ctx, irisMsg.DenomId, irisMsg.Id, owner)
 }
