@@ -9,6 +9,7 @@ import (
 )
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
+	cdc.RegisterConcrete(&MsgIssueDenom{}, "cosmminden/MsgIssueDenom", nil)
 	cdc.RegisterConcrete(&MsgMintNFT{}, "cosmminden/MsgMintNFT", nil)
 	cdc.RegisterConcrete(&MsgEditNFT{}, "cosmminden/MsgEditNFT", nil)
 	cdc.RegisterConcrete(&MsgTransferNFT{}, "cosmminden/MsgTransferNFT", nil)
@@ -18,6 +19,7 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
+		&MsgIssueDenom{},
 		&MsgMintNFT{},
 		&MsgEditNFT{},
 		&MsgTransferNFT{},
