@@ -7,10 +7,8 @@ import (
 )
 
 func (k Keeper) toIrisMsgIssueDenom(ctx sdk.Context, msg *types.MsgIssueDenom) (*irismodtypes.MsgIssueDenom, error) {
-	denomID := k.NewDenomID(ctx)
-
 	return irismodtypes.NewMsgIssueDenom(
-		denomID.String(),
+		msg.DenomId,
 		msg.Name,
 		msg.Schema,
 		msg.Sender,
@@ -25,7 +23,7 @@ func (k Keeper) toIrisMsgMintNFT(ctx sdk.Context, msg *types.MsgMintNFT) (*irism
 
 	return irismodtypes.NewMsgMintNFT(
 		tokenID.String(),
-		types.DenomID(msg.DenomId).String(),
+		msg.DenomId,
 		msg.Name,
 		msg.URI,
 		msg.Data,
@@ -42,7 +40,7 @@ func (k Keeper) toIrisMsgEditNFT(ctx sdk.Context, msg *types.MsgEditNFT) (*irism
 
 	return irismodtypes.NewMsgEditNFT(
 		types.TokenID(msg.Id).String(),
-		types.DenomID(msg.DenomId).String(),
+		msg.DenomId,
 		msg.Name,
 		nft.GetURI(),
 		msg.Data,
@@ -58,7 +56,7 @@ func (k Keeper) toIrisMsgTransferNFT(ctx sdk.Context, msg *types.MsgTransferNFT)
 
 	return irismodtypes.NewMsgTransferNFT(
 		types.TokenID(msg.Id).String(),
-		types.DenomID(msg.DenomId).String(),
+		msg.DenomId,
 		nft.GetName(),
 		nft.GetURI(),
 		nft.GetData(),
@@ -71,6 +69,6 @@ func (k Keeper) toIrisMsgBurnNFT(ctx sdk.Context, msg *types.MsgBurnNFT) (*irism
 	return irismodtypes.NewMsgBurnNFT(
 		msg.Sender,
 		types.TokenID(msg.Id).String(),
-		types.DenomID(msg.DenomId).String(),
+		msg.DenomId,
 	), nil
 }

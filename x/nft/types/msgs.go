@@ -26,11 +26,12 @@ var (
 )
 
 // NewMsgIssueDenom is a constructor function for MsgSetName
-func NewMsgIssueDenom(denomName, schema, sender string) *MsgIssueDenom {
+func NewMsgIssueDenom(denomId, denomName, schema, sender string) *MsgIssueDenom {
 	return &MsgIssueDenom{
-		Sender: sender,
-		Name:   denomName,
-		Schema: schema,
+		DenomId: denomId,
+		Sender:  sender,
+		Name:    denomName,
+		Schema:  schema,
 	}
 }
 
@@ -42,6 +43,9 @@ func (msg MsgIssueDenom) Type() string { return TypeMsgIssueDenom }
 
 // ValidateBasic Implements Msg.
 func (msg MsgIssueDenom) ValidateBasic() error {
+	if err := irismodtypes.ValidateDenomID(msg.DenomId); err != nil {
+		return err
+	}
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
@@ -65,7 +69,7 @@ func (msg MsgIssueDenom) GetSigners() []sdk.AccAddress {
 
 // NewMsgMintNFT is a constructor function for MsgMintNFT
 func NewMsgMintNFT(
-	denomID uint64, tokenName, tokenURI, tokenData, sender, recipient string,
+	denomID string, tokenName, tokenURI, tokenData, sender, recipient string,
 ) *MsgMintNFT {
 	return &MsgMintNFT{
 		DenomId:   denomID,
@@ -85,13 +89,19 @@ func (msg MsgMintNFT) Type() string { return TypeMsgMintNFT }
 
 // ValidateBasic Implements Msg.
 func (msg MsgMintNFT) ValidateBasic() error {
+	if err := irismodtypes.ValidateDenomID(msg.DenomId); err != nil {
+		return err
+	}
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
 	if _, err := sdk.AccAddressFromBech32(msg.Recipient); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid receipt address (%s)", err)
 	}
-	return irismodtypes.ValidateDenomID(fmt.Sprintf("%d", msg.DenomId))
+	if err := irismodtypes.ValidateTokenURI(msg.URI); err != nil {
+		return err
+	}
+	return nil
 }
 
 // GetSignBytes Implements Msg.
@@ -111,7 +121,7 @@ func (msg MsgMintNFT) GetSigners() []sdk.AccAddress {
 
 // NewMsgEditNFT is a constructor function for MsgSetName
 func NewMsgEditNFT(
-	denomID, tokenID uint64, tokenName, tokenData, sender string,
+	denomID string, tokenID uint64, tokenName, tokenData, sender string,
 ) *MsgEditNFT {
 	return &MsgEditNFT{
 		DenomId: denomID,
@@ -130,14 +140,12 @@ func (msg MsgEditNFT) Type() string { return TypeMsgEditNFT }
 
 // ValidateBasic Implements Msg.
 func (msg MsgEditNFT) ValidateBasic() error {
+	if err := irismodtypes.ValidateDenomID(msg.DenomId); err != nil {
+		return err
+	}
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
-
-	if err := irismodtypes.ValidateDenomID(fmt.Sprintf("%d", msg.DenomId)); err != nil {
-		return err
-	}
-
 	return irismodtypes.ValidateTokenID(fmt.Sprintf("%d", msg.Id))
 }
 
@@ -158,7 +166,7 @@ func (msg MsgEditNFT) GetSigners() []sdk.AccAddress {
 
 // NewMsgTransferNFT is a constructor function for MsgSetName
 func NewMsgTransferNFT(
-	denomID, tokenID uint64, sender, recipient string,
+	denomID string, tokenID uint64, sender, recipient string,
 ) *MsgTransferNFT {
 	return &MsgTransferNFT{
 		DenomId:   denomID,
@@ -176,14 +184,12 @@ func (msg MsgTransferNFT) Type() string { return TypeMsgTransferNFT }
 
 // ValidateBasic Implements Msg.
 func (msg MsgTransferNFT) ValidateBasic() error {
-	if err := irismodtypes.ValidateDenomID(fmt.Sprintf("%d", msg.DenomId)); err != nil {
+	if err := irismodtypes.ValidateDenomID(msg.DenomId); err != nil {
 		return err
 	}
-
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
-
 	if _, err := sdk.AccAddressFromBech32(msg.Recipient); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid recipient address (%s)", err)
 	}
@@ -206,11 +212,11 @@ func (msg MsgTransferNFT) GetSigners() []sdk.AccAddress {
 }
 
 // NewMsgBurnNFT is a constructor function for MsgBurnNFT
-func NewMsgBurnNFT(sender string, denomID, tokenID uint64) *MsgBurnNFT {
+func NewMsgBurnNFT(sender, denomID string, tokenID uint64) *MsgBurnNFT {
 	return &MsgBurnNFT{
 		Sender:  sender,
-		Id:      tokenID,
 		DenomId: denomID,
+		Id:      tokenID,
 	}
 }
 
@@ -222,11 +228,11 @@ func (msg MsgBurnNFT) Type() string { return TypeMsgBurnNFT }
 
 // ValidateBasic Implements Msg.
 func (msg MsgBurnNFT) ValidateBasic() error {
+	if err := irismodtypes.ValidateDenomID(msg.DenomId); err != nil {
+		return err
+	}
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
-	}
-	if err := irismodtypes.ValidateDenomID(fmt.Sprintf("%d", msg.DenomId)); err != nil {
-		return err
 	}
 	return irismodtypes.ValidateTokenID(fmt.Sprintf("%d", msg.Id))
 }

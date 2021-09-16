@@ -20,21 +20,20 @@ service Msg {
 message MsgIssueDenom {
     option (gogoproto.equal) = true;
 
-    string name = 1;
-    string schema = 2;
-    string sender = 3;
+    string denom_id = 1 [ (gogoproto.moretags) = "yaml:\"denom_id\"" ];
+    string name = 2;
+    string schema = 3;
+    string sender = 4;
 }
 
 // MsgIssueDenomResponse defines the Msg/IssueDenom response type.
-message MsgIssueDenomResponse {
-    uint64 id = 1;
-}
+message MsgIssueDenomResponse {}
 
 // MsgMintNFT defines an SDK message for creating a new NFT.
 message MsgMintNFT {
     option (gogoproto.equal) = true;
 
-    uint64 denom_id = 1 [ (gogoproto.moretags) = "yaml:\"denom_id\"" ];
+    string denom_id = 1 [ (gogoproto.moretags) = "yaml:\"denom_id\"" ];
     string name = 2;
     string uri = 3 [ (gogoproto.customname) = "URI" ];
     string data = 4;
@@ -51,7 +50,7 @@ message MsgMintNFTResponse {
 message MsgEditNFT {
     option (gogoproto.equal) = true;
 
-    uint64 denom_id = 1 [ (gogoproto.moretags) = "yaml:\"denom_id\"" ];
+    string denom_id = 1 [ (gogoproto.moretags) = "yaml:\"denom_id\"" ];
     uint64 id = 2;
     string name = 3;
     string data = 4;
@@ -65,7 +64,7 @@ message MsgEditNFTResponse {}
 message MsgTransferNFT {
     option (gogoproto.equal) = true;
 
-    uint64 denom_id = 1 [ (gogoproto.moretags) = "yaml:\"denom_id\"" ];
+    string denom_id = 1 [ (gogoproto.moretags) = "yaml:\"denom_id\"" ];
     uint64 id = 2;
     string sender = 3;
     string recipient = 4;
@@ -78,7 +77,7 @@ message MsgTransferNFTResponse {}
 message MsgBurnNFT {
     option (gogoproto.equal) = true;
 
-    uint64 denom_id = 1 [ (gogoproto.moretags) = "yaml:\"denom_id\"" ];
+    string denom_id = 1 [ (gogoproto.moretags) = "yaml:\"denom_id\"" ];
     uint64 id = 2;
     string sender = 3;
 }

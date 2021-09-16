@@ -3,10 +3,10 @@ package cli
 import (
 	"fmt"
 
-	"github.com/spf13/cobra"
-	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos-gaminghub/nibiru/x/nft/types"
+	"github.com/cosmos/cosmos-sdk/client"
 	iriscli "github.com/irisnet/irismod/modules/nft/client/cli"
+	"github.com/spf13/cobra"
 )
 
 // GetQueryCmd returns the cli query commands for this module

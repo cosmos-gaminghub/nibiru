@@ -54,13 +54,9 @@ func (k Keeper) IrisKeeper() irismodkeeper.Keeper {
 	return k.irisKeeper
 }
 
-func (k Keeper) NewDenomID(ctx sdk.Context) types.DenomID {
-	return types.DenomID(k.GetDenomCount(ctx) + types.MIN_DENOM_ID)
-}
-
-func (k Keeper) NewTokenID(ctx sdk.Context, denomID uint64) (tokenID types.TokenID, err error) {
-	if !k.irisKeeper.HasDenomID(ctx, types.DenomID(denomID).String()) {
-		err = sdkerrors.Wrapf(irismodtypes.ErrInvalidDenom, "denom ID %s not exists", types.DenomID(denomID).String())
+func (k Keeper) NewTokenID(ctx sdk.Context, denomID string) (tokenID types.TokenID, err error) {
+	if !k.irisKeeper.HasDenomID(ctx, denomID) {
+		err = sdkerrors.Wrapf(irismodtypes.ErrInvalidDenom, "denom ID %s not exists", denomID)
 		return
 	}
 
@@ -72,34 +68,32 @@ func (k Keeper) GetDenomCount(ctx sdk.Context) uint64 {
 	return uint64(len(k.irisKeeper.GetDenoms(ctx)))
 }
 
-func (k Keeper) GetNFTCount(ctx sdk.Context, denomID uint64) uint64 {
-	return uint64(len(k.irisKeeper.GetNFTs(ctx, types.DenomID(denomID).String())))
+func (k Keeper) GetNFTCount(ctx sdk.Context, denomID string) uint64 {
+	return uint64(len(k.irisKeeper.GetNFTs(ctx, denomID)))
 }
 
 // GetNFT gets the the specified NFT
-func (k Keeper) GetNFT(ctx sdk.Context, denomID, tokenID uint64) (irismodexported.NFT, error) {
-	return k.irisKeeper.GetNFT(ctx, types.DenomID(denomID).String(), types.TokenID(tokenID).String())
+func (k Keeper) GetNFT(ctx sdk.Context, denomID string, tokenID uint64) (irismodexported.NFT, error) {
+	return k.irisKeeper.GetNFT(ctx, denomID, types.TokenID(tokenID).String())
 }
 
 // IssueDeno issues a denom according to the given params
-func (k Keeper) IssueDenom(ctx sdk.Context, msg *types.MsgIssueDenom) (uint64, error) {
+func (k Keeper) IssueDenom(ctx sdk.Context, msg *types.MsgIssueDenom) error {
 	irisMsg, err := k.toIrisMsgIssueDenom(ctx, msg)
 	if err != nil {
-		return 0, err
+		return err
 	}
 
 	creator, err := sdk.AccAddressFromBech32(irisMsg.Sender)
 	if err != nil {
-		return 0, err
+		return err
 	}
 
 	if err = k.irisKeeper.IssueDenom(ctx, irisMsg.Id, irisMsg.Name, irisMsg.Schema, creator); err != nil {
-		return 0, err
+		return err
 	}
 
-	denomID, _ := types.ToDenomID(irisMsg.Id)
-
-	return denomID.Uint64(), nil
+	return nil
 }
 
 // MintNFT mints an NFT and manages the NFT's existence within Collections and Owners

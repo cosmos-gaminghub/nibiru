@@ -40,55 +40,25 @@ func setupKeeper(t testing.TB) (*Keeper, sdk.Context) {
 	return keeper, ctx
 }
 
-func TestNewDenomID(t *testing.T) {
-	var (
-		keeper, ctx = setupKeeper(t)
-		owner       = testutil.CreateTestAddrs(1)[0]
-	)
-
-	for _, tc := range []struct {
-		desc       string
-		prepare    func()
-		expectedID types.DenomID
-	}{
-		{
-			desc:       "first id",
-			prepare:    func() {},
-			expectedID: types.DenomID(100),
-		},
-		{
-			desc: "second id",
-			prepare: func() {
-				keeper.IssueDenom(ctx, types.NewMsgIssueDenom("name", "schema", owner.String()))
-			},
-			expectedID: types.DenomID(101),
-		},
-	} {
-		t.Run(tc.desc, func(t *testing.T) {
-			tc.prepare()
-			id := keeper.NewDenomID(ctx)
-			require.Equal(t, tc.expectedID, id)
-		})
-	}
-}
-
 func TestNewTokenID(t *testing.T) {
 	var (
 		keeper, ctx = setupKeeper(t)
 		owner       = testutil.CreateTestAddrs(1)[0]
-		denomID, _  = keeper.IssueDenom(ctx, types.NewMsgIssueDenom("name", "schema", owner.String()))
+		denomID     = "denomID"
 	)
+
+	keeper.IssueDenom(ctx, types.NewMsgIssueDenom(denomID, "name", "schema", owner.String()))
 
 	for _, tc := range []struct {
 		desc       string
-		denomID    uint64
+		denomID    string
 		prepare    func()
 		expectedID types.TokenID
 		err        error
 	}{
 		{
 			desc:    "invalid denomID",
-			denomID: 0,
+			denomID: "invalid",
 			prepare: func() {},
 			err:     irismodtypes.ErrInvalidDenom,
 		},
@@ -96,7 +66,7 @@ func TestNewTokenID(t *testing.T) {
 			desc:       "first id",
 			denomID:    denomID,
 			prepare:    func() {},
-			expectedID: types.TokenID(100),
+			expectedID: types.TokenID(types.MIN_TOKEN_ID),
 		},
 		{
 			desc:    "second id",
@@ -104,7 +74,7 @@ func TestNewTokenID(t *testing.T) {
 			prepare: func() {
 				keeper.MintNFT(ctx, types.NewMsgMintNFT(denomID, "name", "token-uri", "data", owner.String(), owner.String()))
 			},
-			expectedID: types.TokenID(101),
+			expectedID: types.TokenID(types.MIN_TOKEN_ID + 1),
 		},
 	} {
 		t.Run(tc.desc, func(t *testing.T) {
@@ -128,13 +98,12 @@ func TestIssueDenomMintEditTransferBurnNFT(t *testing.T) {
 	)
 
 	// IssueDenom
-	expectedDenomID := uint64(100)
-	denomID, err := keeper.IssueDenom(ctx, types.NewMsgIssueDenom("name", "schema", owner.String()))
+	denomID := "denomID"
+	err := keeper.IssueDenom(ctx, types.NewMsgIssueDenom(denomID, "name", "schema", owner.String()))
 	require.NoError(t, err)
-	require.Equal(t, expectedDenomID, denomID)
 
 	// MintNFT
-	expectedTokenid := uint64(100)
+	expectedTokenid := uint64(types.MIN_TOKEN_ID)
 	tokenID, err := keeper.MintNFT(ctx, types.NewMsgMintNFT(denomID, "name", "token-uri", "data", owner.String(), owner.String()))
 	require.NoError(t, err)
 	require.Equal(t, expectedTokenid, tokenID)

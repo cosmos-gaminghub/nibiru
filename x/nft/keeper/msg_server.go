@@ -38,11 +38,7 @@ func (m msgServer) IssueDenom(goCtx context.Context, msg *types.MsgIssueDenom) (
 		return nil, err
 	}
 
-	denomID, _ := types.ToDenomID(irisMsg.Id)
-
-	return &types.MsgIssueDenomResponse{
-		Id: denomID.Uint64(),
-	}, nil
+	return &types.MsgIssueDenomResponse{}, nil
 }
 
 func (m msgServer) MintNFT(goCtx context.Context, msg *types.MsgMintNFT) (*types.MsgMintNFTResponse, error) {

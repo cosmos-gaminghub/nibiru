@@ -3,4 +3,5 @@ vendor/
 .DS_Store
 .tags
 build/
-
+note.txt
+.chaindata

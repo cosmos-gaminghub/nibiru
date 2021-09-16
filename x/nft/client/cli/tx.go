@@ -49,19 +49,22 @@ func GetTxCmd() *cobra.Command {
 // GetCmdIssueDenom is the CLI command for an IssueDenom transaction
 func GetCmdIssueDenom() *cobra.Command {
 	cmd := iriscli.GetCmdIssueDenom()
-	cmd.Use = "issue"
 	cmd.Example = fmt.Sprintf(
-		"$ %s tx nft issue <name> "+
+		"$ %s tx nft issue <denom-id> "+
+			"--name=<denom-name> "+
 			"--schema=<schema-content or path to schema.json> ",
 		version.AppName,
 	)
-	cmd.Args = cobra.ExactArgs(1)
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 		clientCtx, err := client.GetClientTxContext(cmd)
 		if err != nil {
 			return err
 		}
 
+		denomName, err := cmd.Flags().GetString(iriscli.FlagDenomName)
+		if err != nil {
+			return err
+		}
 		schema, err := cmd.Flags().GetString(iriscli.FlagSchema)
 		if err != nil {
 			return err
@@ -73,6 +76,7 @@ func GetCmdIssueDenom() *cobra.Command {
 
 		msg := types.NewMsgIssueDenom(
 			args[0],
+			denomName,
 			schema,
 			clientCtx.GetFromAddress().String(),
 		)
@@ -131,13 +135,8 @@ func GetCmdMintNFT() *cobra.Command {
 			return err
 		}
 
-		denomID, err := types.ToDenomID(args[0])
-		if err != nil {
-			return err
-		}
-
 		msg := types.NewMsgMintNFT(
-			denomID.Uint64(),
+			args[0],
 			tokenName,
 			tokenURI,
 			tokenData,
@@ -176,18 +175,13 @@ func GetCmdEditNFT() *cobra.Command {
 		if err != nil {
 			return err
 		}
-
-		denomID, err := types.ToDenomID(args[0])
-		if err != nil {
-			return err
-		}
 		tokenID, err := types.ToTokenID(args[1])
 		if err != nil {
 			return err
 		}
 
 		msg := types.NewMsgEditNFT(
-			denomID.Uint64(),
+			args[0],
 			tokenID.Uint64(),
 			tokenName,
 			tokenData,
@@ -218,18 +212,13 @@ func GetCmdTransferNFT() *cobra.Command {
 		if _, err := sdk.AccAddressFromBech32(args[0]); err != nil {
 			return err
 		}
-
-		denomID, err := types.ToDenomID(args[1])
-		if err != nil {
-			return err
-		}
 		tokenID, err := types.ToTokenID(args[2])
 		if err != nil {
 			return err
 		}
 
 		msg := types.NewMsgTransferNFT(
-			denomID.Uint64(),
+			args[1],
 			tokenID.Uint64(),
 			clientCtx.GetFromAddress().String(),
 			args[0],
@@ -252,10 +241,6 @@ func GetCmdBurnNFT() *cobra.Command {
 			return err
 		}
 
-		denomID, err := types.ToDenomID(args[0])
-		if err != nil {
-			return err
-		}
 		tokenID, err := types.ToTokenID(args[1])
 		if err != nil {
 			return err
@@ -263,7 +248,7 @@ func GetCmdBurnNFT() *cobra.Command {
 
 		msg := types.NewMsgBurnNFT(
 			clientCtx.GetFromAddress().String(),
-			denomID.Uint64(),
+			args[0],
 			tokenID.Uint64(),
 		)
 		if err := msg.ValidateBasic(); err != nil {
