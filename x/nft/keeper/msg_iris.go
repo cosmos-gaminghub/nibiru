@@ -22,7 +22,7 @@ func (k Keeper) toIrisMsgMintNFT(ctx sdk.Context, msg *types.MsgMintNFT) (*irism
 	}
 
 	return irismodtypes.NewMsgMintNFT(
-		tokenID.String(),
+		tokenID.ToIris(),
 		msg.DenomId,
 		msg.Name,
 		msg.URI,
@@ -39,7 +39,7 @@ func (k Keeper) toIrisMsgEditNFT(ctx sdk.Context, msg *types.MsgEditNFT) (*irism
 	}
 
 	return irismodtypes.NewMsgEditNFT(
-		types.TokenID(msg.Id).String(),
+		types.TokenID(msg.Id).ToIris(),
 		msg.DenomId,
 		msg.Name,
 		nft.GetURI(),
@@ -55,7 +55,7 @@ func (k Keeper) toIrisMsgTransferNFT(ctx sdk.Context, msg *types.MsgTransferNFT)
 	}
 
 	return irismodtypes.NewMsgTransferNFT(
-		types.TokenID(msg.Id).String(),
+		types.TokenID(msg.Id).ToIris(),
 		msg.DenomId,
 		nft.GetName(),
 		nft.GetURI(),
@@ -68,7 +68,7 @@ func (k Keeper) toIrisMsgTransferNFT(ctx sdk.Context, msg *types.MsgTransferNFT)
 func (k Keeper) toIrisMsgBurnNFT(ctx sdk.Context, msg *types.MsgBurnNFT) (*irismodtypes.MsgBurnNFT, error) {
 	return irismodtypes.NewMsgBurnNFT(
 		msg.Sender,
-		types.TokenID(msg.Id).String(),
+		types.TokenID(msg.Id).ToIris(),
 		msg.DenomId,
 	), nil
 }

@@ -29,7 +29,7 @@ func TestMsgMintNFT(t *testing.T) {
 		srv, ctx   = setupMsgServer(t)
 		denomID    = "denomID"
 		owner      = testutil.CreateTestAddrs(1)[0].String()
-		expectedId = uint64(100)
+		expectedId = uint64(types.MIN_TOKEN_ID)
 	)
 	srv.IssueDenom(ctx, &types.MsgIssueDenom{denomID, "name", "schema", owner})
 	resp, err := srv.MintNFT(ctx, &types.MsgMintNFT{denomID, "name", "uri", "data", owner, owner})
@@ -41,7 +41,7 @@ func TestMsgEditNFT(t *testing.T) {
 	var (
 		srv, ctx = setupMsgServer(t)
 		denomID  = "denomID"
-		tokenid  = uint64(100)
+		tokenid  = uint64(types.MIN_TOKEN_ID)
 		owner    = testutil.CreateTestAddrs(1)[0].String()
 	)
 	srv.IssueDenom(ctx, &types.MsgIssueDenom{denomID, "name", "schema", owner})
@@ -54,7 +54,7 @@ func TestMsgTransferNFT(t *testing.T) {
 	var (
 		srv, ctx  = setupMsgServer(t)
 		denomID   = "denomID"
-		tokenid   = uint64(100)
+		tokenid   = uint64(types.MIN_TOKEN_ID)
 		owner     = testutil.CreateTestAddrs(1)[0].String()
 		receipent = testutil.CreateTestAddrs(2)[1].String()
 	)
@@ -68,7 +68,7 @@ func TestMsgBurnNFT(t *testing.T) {
 	var (
 		srv, ctx = setupMsgServer(t)
 		denomID  = "denomID"
-		tokenid  = uint64(100)
+		tokenid  = uint64(types.MIN_TOKEN_ID)
 		owner    = testutil.CreateTestAddrs(1)[0].String()
 	)
 	srv.IssueDenom(ctx, &types.MsgIssueDenom{denomID, "name", "schema", owner})

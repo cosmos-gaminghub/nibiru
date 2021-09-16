@@ -74,7 +74,7 @@ func (k Keeper) GetNFTCount(ctx sdk.Context, denomID string) uint64 {
 
 // GetNFT gets the the specified NFT
 func (k Keeper) GetNFT(ctx sdk.Context, denomID string, tokenID uint64) (irismodexported.NFT, error) {
-	return k.irisKeeper.GetNFT(ctx, denomID, types.TokenID(tokenID).String())
+	return k.irisKeeper.GetNFT(ctx, denomID, types.TokenID(tokenID).ToIris())
 }
 
 // IssueDeno issues a denom according to the given params
@@ -112,7 +112,7 @@ func (k Keeper) MintNFT(ctx sdk.Context, msg *types.MsgMintNFT) (uint64, error) 
 		return 0, err
 	}
 
-	tokenID, _ := types.ToTokenID(irisMsg.Id)
+	tokenID, _ := types.FromIrisTokenID(irisMsg.Id)
 
 	return tokenID.Uint64(), nil
 }

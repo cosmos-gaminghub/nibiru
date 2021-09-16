@@ -53,7 +53,7 @@ func (m msgServer) MintNFT(goCtx context.Context, msg *types.MsgMintNFT) (*types
 		return nil, err
 	}
 
-	tokenID, _ := types.ToTokenID(irisMsg.Id)
+	tokenID, _ := types.FromIrisTokenID(irisMsg.Id)
 
 	return &types.MsgMintNFTResponse{
 		Id: tokenID.Uint64(),
