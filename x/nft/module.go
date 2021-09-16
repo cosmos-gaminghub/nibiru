@@ -19,6 +19,7 @@ import (
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
+	irismodtypes "github.com/irisnet/irismod/modules/nft/types"
 	// this line is used by starport scaffolding # ibc/module/import
 )
 
@@ -131,7 +132,7 @@ func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc *codec.LegacyAmino) sd
 // RegisterServices registers a GRPC query service to respond to the
 // module-specific GRPC queries.
 func (am AppModule) RegisterServices(cfg module.Configurator) {
-	types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
+	irismodtypes.RegisterQueryServer(cfg.QueryServer(), am.keeper.IrisKeeper())
 }
 
 // RegisterInvariants registers the capability module's invariants.

@@ -50,6 +50,10 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
+func (k Keeper) IrisKeeper() irismodkeeper.Keeper {
+	return k.irisKeeper
+}
+
 func (k Keeper) NewDenomID(ctx sdk.Context) types.DenomID {
 	return types.DenomID(k.GetDenomCount(ctx) + types.MIN_DENOM_ID)
 }

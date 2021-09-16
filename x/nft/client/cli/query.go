@@ -2,15 +2,11 @@ package cli
 
 import (
 	"fmt"
-	// "strings"
 
 	"github.com/spf13/cobra"
-
 	"github.com/cosmos/cosmos-sdk/client"
-	// "github.com/cosmos/cosmos-sdk/client/flags"
-	// sdk "github.com/cosmos/cosmos-sdk/types"
-
 	"github.com/cosmos-gaminghub/nibiru/x/nft/types"
+	iriscli "github.com/irisnet/irismod/modules/nft/client/cli"
 )
 
 // GetQueryCmd returns the cli query commands for this module
@@ -23,6 +19,15 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
+
+	cmd.AddCommand(
+		iriscli.GetCmdQueryDenom(),
+		iriscli.GetCmdQueryDenoms(),
+		iriscli.GetCmdQueryCollection(),
+		iriscli.GetCmdQuerySupply(),
+		iriscli.GetCmdQueryOwner(),
+		iriscli.GetCmdQueryNFT(),
+	)
 
 	// this line is used by starport scaffolding # 1
 
