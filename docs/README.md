@@ -26,15 +26,15 @@ Start Creating 4 Nibiru node in your computer. In this pattern, each node will c
 
 3. [**Join Testnet**](testnets/fullnode.md)
 
-Nibiru-1000 is the current testnet of Cosmos Gaming Hub.
-You can check the detail in [Cosmos Gaming Explorer](http://nibiru.cosmosgamingexplorer.com/).
+Nibiru-2000 is the current testnet of GAME.
+You can check the detail in [GAME Explorer](https://nibiru-2000.game-explorer.io/).
 
 
 ## Reference
-- [Twitter](https://twitter.com/cosmosgaminghub)
-- [Medium EN](https://medium.com/cosmosgaminghub/english/home)
-- [Medium JA](https://medium.com/cosmosgaminghub/japanese/home)
-- [Medium CH](https://medium.com/cosmosgaminghub/chinese/home)
-- [Whitepaper EN](https://whitepaper.cosmosgaminghub.com/en)
-- [Whitepaper JA](https://whitepaper.cosmosgaminghub.com/ja)
-- [Whitepaper CH](https://whitepaper.cosmosgaminghub.com/ch)
+- [Twitter](https://twitter.com/_GAME_official)
+- [Medium EN](https://medium.com/game/english/home)
+- [Medium JA](https://medium.com/game/japanese/home)
+- [Medium CH](https://medium.com/game/chinese/home)
+- [Whitepaper EN](https://whitepaper.gamenet.one/en)
+- [Whitepaper JA](https://whitepaper.gamenet.one/ja)
+- [Whitepaper CH](https://whitepaper.gamenet.one/ch)
