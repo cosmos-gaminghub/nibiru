@@ -1,6 +1,6 @@
 module.exports = {
     title: "Nibiru",
-    description: "Documentation for the Cosmos Gaming Hub",
+    description: "Documentation for GAME project",
     head: [
         ['link', {rel: 'icon', href: '/assets/logo.png'}],
 		],
@@ -17,7 +17,7 @@ module.exports = {
         lastUpdated: true,
         logo: "/assets/logo.png",
         nav: [
-            {text: "Website", link: "https://cosmosgaminghub.com", target: "_blank"},
+            {text: "Website", link: "https://gamenet.one", target: "_blank"},
         ],
         sidebarDepth: 2,
         sidebar: [
