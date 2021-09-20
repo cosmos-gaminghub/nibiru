@@ -97,32 +97,32 @@ func TestIssueDenomMintEditTransferBurnNFT(t *testing.T) {
 		recipient   = testutil.CreateTestAddrs(2)[1]
 	)
 
-	// IssueDenom
+	//------test IssueDenom()-------------
 	denomID := "denomID"
 	err := keeper.IssueDenom(ctx, types.NewMsgIssueDenom(denomID, "name", "schema", owner.String()))
 	require.NoError(t, err)
 
-	// MintNFT
+	//------test MintNFT()-------------
 	expectedTokenid := uint64(types.MIN_TOKEN_ID)
 	tokenID, err := keeper.MintNFT(ctx, types.NewMsgMintNFT(denomID, "name", "token-uri", "data", owner.String(), owner.String()))
 	require.NoError(t, err)
 	require.Equal(t, expectedTokenid, tokenID)
 
-	// EditNFT
+	//------test EditNFT()-------------
 	expectedData := "new-token-data"
 	err = keeper.EditNFT(ctx, types.NewMsgEditNFT(denomID, tokenID, "new-name", expectedData, owner.String()))
 	require.NoError(t, err)
 	nft, _ := keeper.GetNFT(ctx, denomID, tokenID)
 	require.Equal(t, expectedData, nft.GetData())
 
-	// TransferNFT
+	//------test TransferNFT()-------------
 	err = keeper.TransferNFT(ctx, types.NewMsgTransferNFT(denomID, tokenID, owner.String(), recipient.String()))
 	require.NoError(t, err)
 	nft, err = keeper.GetNFT(ctx, denomID, tokenID)
 	require.NoError(t, err)
 	require.Equal(t, nft.GetOwner(), recipient)
 
-	// BurnNFT
+	//------test BurnNFT()-------------
 	err = keeper.BurnNFT(ctx, types.NewMsgBurnNFT(recipient.String(), denomID, tokenID))
 	require.NoError(t, err)
 	_, err = keeper.GetNFT(ctx, denomID, tokenID)

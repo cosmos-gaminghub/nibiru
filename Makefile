@@ -29,7 +29,7 @@ ldflags := $(strip $(ldflags))
 
 BUILD_FLAGS := -tags "$(build_tags)" -ldflags '$(ldflags)'
 
-PACKAGES=$(shell go list ./... | grep -v '/simulation')
+PACKAGES=$(shell go list ./... | grep -v '/simulation' | grep -v '/cli')
 
 #### Command List ####
 
@@ -73,6 +73,9 @@ fmt:
 
 test:
 	@go test -mod=readonly $(PACKAGES)
+
+testcli:
+	@go test -mod=readonly $(shell go list ./... | grep '/cli')
 
 protogen:
 	starport generate proto-go

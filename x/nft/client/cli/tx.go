@@ -235,6 +235,7 @@ func GetCmdTransferNFT() *cobra.Command {
 // GetCmdBurnNFT is the CLI command for sending a BurnNFT transaction
 func GetCmdBurnNFT() *cobra.Command {
 	cmd := iriscli.GetCmdTransferNFT()
+	cmd.Args = cobra.ExactArgs(2)
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 		clientCtx, err := client.GetClientTxContext(cmd)
 		if err != nil {

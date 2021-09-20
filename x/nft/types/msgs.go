@@ -1,8 +1,6 @@
 package types
 
 import (
-	"fmt"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	irismodtypes "github.com/irisnet/irismod/modules/nft/types"
@@ -146,7 +144,7 @@ func (msg MsgEditNFT) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
-	return irismodtypes.ValidateTokenID(fmt.Sprintf("%d", msg.Id))
+	return irismodtypes.ValidateTokenID(TokenID(msg.Id).ToIris())
 }
 
 // GetSignBytes Implements Msg.
@@ -193,7 +191,7 @@ func (msg MsgTransferNFT) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.Recipient); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid recipient address (%s)", err)
 	}
-	return irismodtypes.ValidateTokenID(fmt.Sprintf("%d", msg.Id))
+	return irismodtypes.ValidateTokenID(TokenID(msg.Id).ToIris())
 }
 
 // GetSignBytes Implements Msg.
@@ -234,7 +232,7 @@ func (msg MsgBurnNFT) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.Sender); err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid sender address (%s)", err)
 	}
-	return irismodtypes.ValidateTokenID(fmt.Sprintf("%d", msg.Id))
+	return irismodtypes.ValidateTokenID(TokenID(msg.Id).ToIris())
 }
 
 // GetSignBytes Implements Msg.
