@@ -18,7 +18,7 @@ import (
 	tmos "github.com/tendermint/tendermint/libs/os"
 	dbm "github.com/tendermint/tm-db"
 
-	gaiaappparams "github.com/cosmos-gaminghub/nibiru/app/params"
+	nibiruappparams "github.com/cosmos-gaminghub/nibiru/app/params"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
@@ -226,7 +226,7 @@ func NewNibiruApp(
 	skipUpgradeHeights map[int64]bool,
 	homePath string,
 	invCheckPeriod uint,
-	encodingConfig gaiaappparams.EncodingConfig,
+	encodingConfig nibiruappparams.EncodingConfig,
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) *NibiruApp {

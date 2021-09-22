@@ -15,41 +15,42 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const (
+	MaxCap                 = 5000
+	TotalGameAirdropAmount = 1000000 // 0.5% * 200000000
+)
+
 type Snapshot struct {
-	TotalGameAmount          sdk.Int `json:"total_game_amount"`
-	TotalNibiruAirdropAmount sdk.Int `json:"total_nibiru_amount"`
-	NumberAccounts           uint64  `json:"num_accounts"`
+	TotalAtomAmount        sdk.Int `json:"total_atom_amount"`
+	TotalGameAirdropAmount sdk.Int `json:"total_game_amount"`
+	NumberAccounts         uint64  `json:"num_accounts"`
+	Denominator            sdk.Int `json:"denominator"`
 
 	Accounts map[string]SnapshotAccount `json:"accounts"`
 }
 
 // SnapshotAccount provide fields of snapshot per account
 type SnapshotAccount struct {
-	GameAddress string `json:"game_address"` // game Balance = GametakedBalance + GameUnstakedBalance
+	AtomAddress string `json:"atom_address"` // Atom Balance = AtomStakedBalance + AtomUnstakedBalance
 
-	GameBalance          sdk.Int `json:"game_balance"`
-	GameOwnershipPercent sdk.Dec `json:"game_ownership_percent"`
+	AtomBalance          sdk.Int `json:"atom_balance"`
+	AtomOwnershipPercent sdk.Dec `json:"atom_ownership_percent"`
 
-	GameStakedBalance   sdk.Int `json:"game_staked_balance"`
-	GameUnstakedBalance sdk.Int `json:"game_unstaked_balance"` // GameStakedPercent = GameStakedBalance / GameBalance
-	GameStakedPercent   sdk.Dec `json:"game_staked_percent"`
+	AtomStakedBalance   sdk.Int `json:"atom_staked_balance"`
+	AtomUnstakedBalance sdk.Int `json:"atom_unstaked_balance"` // AtomStakedPercent = AtomStakedBalance / AtomBalance
+	AtomStakedPercent   sdk.Dec `json:"atom_staked_percent"`
 
-	NibiruBalance      sdk.Int `json:"nibiru_balance"`           // OsmoBalance = sqrt( GameBalance ) * (1 + 1.5 * game staked percent)
-	NibiruBalanceBase  sdk.Int `json:"nibiru_balance_base"`      // OsmoBalanceBase = sqrt(game balance)
-	NibiruBalanceBonus sdk.Int `json:"nibiru_balance_bonus"`     // OsmoBalanceBonus = OsmoBalanceBase * (1.5 * game staked percent)
-	NibiruPercent      sdk.Dec `json:"nibiru_ownership_percent"` // OsmoPercent = OsmoNormalizedBalance / TotalOsmoSupply
+	GameBalance sdk.Int `json:"game_balance"`
 }
 
 // ExportAirdropSnapshotCmd generates a snapshot.json from a provided cosmos-sdk v0.36 genesis export.
 func ExportAirdropSnapshotCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "export-airdrop-snapshot [airdrop-to-denom] [input-genesis-file] [output-snapshot-json] --nibiru-supply=[osmos-genesis-supply]",
-		Short: "Export a quadratic fairdrop snapshot from a provided cosmos-sdk v0.36 genesis export",
-		Long: `Export a quadratic fairdrop snapshot from a provided cosmos-sdk v0.36 genesis export
-Sample genesis file:
-	https://raw.githubusercontent.com/cephalopodequipment/cosmoshub-3/master/genesis.json
+		Use:   "export-airdrop-snapshot [airdrop-to-denom] [input-genesis-file] [output-snapshot-json] --nibiru-supply=[nibiru-genesis-supply]",
+		Short: "Export a quadratic fairdrop snapshot from a provided cosmos-sdk v0.44 genesis export",
+		Long: `Export a quadratic fairdrop snapshot from a provided cosmos-sdk v0.44 genesis export
 Example:
-	nibirud export-airdrop-snapshot game ~/.nibiru/config/genesis.json ../snapshot.json --nibiru-supply=100000000000000
+	nibirud export-airdrop-snapshot uatom ~/.nibiru/config/genesis.json ../snapshot.json --nibiru-supply=100000000000000
 	- Check input genesis:
 		file is at ~/.nibirud/config/genesis.json
 	- Snapshot
@@ -69,27 +70,40 @@ Example:
 			snapshotOutput := args[2]
 
 			// Read genesis file
-			appState, _, err := genutiltypes.GenesisStateFromGenFile(genesisFile)
+			appState, _, _ := genutiltypes.GenesisStateFromGenFile(genesisFile)
 			bankGenState := banktypes.GetGenesisStateFromAppState(clientCtx.Codec, appState)
 			stakingGenState := stakingtypes.GetGenesisStateFromAppState(clientCtx.Codec, appState)
-			// authGenState := authtypes.GetGenesisStateFromAppState(clientCtx.Codec, appState)
 
-			fmt.Println(bankGenState.Balances)
-
-			// Produce the map of address to total game balance, both staked and unstaked
+			// Produce the map of address to total atom balance, both staked and unstaked
 			snapshotAccs := make(map[string]SnapshotAccount)
 
-			totalGameBalance := sdk.NewInt(0)
+			totalAtomBalance := sdk.NewInt(0)
+			denominator := sdk.NewInt(0)
 			for _, account := range bankGenState.Balances {
 
 				balance := account.Coins.AmountOf(denom)
-				totalGameBalance = totalGameBalance.Add(balance)
+				totalAtomBalance = totalAtomBalance.Add(balance)
+
+				// sum all sqrt of min(balance, max cap)
+				if balance.ToDec().GTE(sdk.NewDec(MaxCap)) {
+					atomSqrt, err := sdk.NewInt(MaxCap).ToDec().ApproxSqrt()
+					if err != nil {
+						panic(fmt.Sprintf("failed to root atom balance: %s", err))
+					}
+					denominator = denominator.Add(atomSqrt.RoundInt())
+				} else {
+					atomSqrt, err := balance.ToDec().ApproxSqrt()
+					if err != nil {
+						panic(fmt.Sprintf("failed to root atom balance: %s", err))
+					}
+					denominator = denominator.Add(atomSqrt.RoundInt())
+				}
 
 				snapshotAccs[account.Address] = SnapshotAccount{
-					GameAddress:         account.Address,
-					GameBalance:         balance,
-					GameStakedBalance:   balance,
-					GameUnstakedBalance: sdk.ZeroInt(),
+					AtomAddress:         account.Address,
+					AtomBalance:         balance,
+					AtomUnstakedBalance: balance,
+					AtomStakedBalance:   sdk.ZeroInt(),
 				}
 			}
 
@@ -100,18 +114,18 @@ Example:
 					panic("no account found for unbonding")
 				}
 
-				unbondingGames := sdk.NewInt(0)
+				unbondingAtoms := sdk.NewInt(0)
 				for _, entry := range unbonding.Entries {
-					unbondingGames = unbondingGames.Add(entry.Balance)
+					unbondingAtoms = unbondingAtoms.Add(entry.Balance)
 				}
 
-				acc.GameBalance = acc.GameBalance.Add(unbondingGames)
-				acc.GameUnstakedBalance = acc.GameUnstakedBalance.Add(unbondingGames)
+				acc.AtomBalance = acc.AtomBalance.Add(unbondingAtoms)
+				acc.AtomUnstakedBalance = acc.AtomUnstakedBalance.Add(unbondingAtoms)
 
 				snapshotAccs[address] = acc
 			}
 
-			// Make a map from validator operator address to the v036 validator type
+			// Make a map from validator operator address to the v44 validator type
 			validators := make(map[string]stakingtypes.Validator)
 			for _, validator := range stakingGenState.Validators {
 				validators[validator.OperatorAddress] = validator
@@ -126,75 +140,56 @@ Example:
 				}
 
 				val := validators[delegation.ValidatorAddress]
-				stakedGames := delegation.Shares.MulInt(val.Tokens).Quo(val.DelegatorShares).RoundInt()
+				stakedAtoms := delegation.Shares.MulInt(val.Tokens).Quo(val.DelegatorShares).RoundInt()
 
-				acc.GameBalance = acc.GameBalance.Add(stakedGames)
-				acc.GameStakedBalance = acc.GameStakedBalance.Add(stakedGames)
+				acc.AtomBalance = acc.AtomBalance.Add(stakedAtoms)
+				acc.AtomStakedBalance = acc.AtomStakedBalance.Add(stakedAtoms)
 
 				snapshotAccs[address] = acc
 			}
 
-			totalNibiruBalance := sdk.NewInt(0)
-			onePointFive := sdk.MustNewDecFromStr("1.5")
-
 			for address, acc := range snapshotAccs {
-				allGames := acc.GameBalance.ToDec()
+				allAtoms := acc.AtomBalance.ToDec()
+				allAtomSqrt, err := allAtoms.ApproxSqrt()
+				if err != nil {
+					panic(fmt.Sprintf("failed to root atom balance: %s", err))
+				}
 
-				acc.GameOwnershipPercent = allGames.QuoInt(totalGameBalance)
+				acc.AtomOwnershipPercent = allAtomSqrt.QuoInt(denominator)
 
-				if allGames.IsZero() {
-					acc.GameStakedPercent = sdk.ZeroDec()
-					acc.NibiruBalanceBase = sdk.ZeroInt()
-					acc.NibiruBalanceBonus = sdk.ZeroInt()
-					acc.NibiruBalance = sdk.ZeroInt()
+				if allAtoms.IsZero() {
+					acc.AtomStakedPercent = sdk.ZeroDec()
+					acc.GameBalance = sdk.ZeroInt()
 					snapshotAccs[address] = acc
 					continue
 				}
 
-				stakedGame := acc.GameStakedBalance.ToDec()
-				stakedPercent := stakedGame.Quo(allGames)
-				acc.GameStakedPercent = stakedPercent
+				stakedAtoms := acc.AtomStakedBalance.ToDec()
+				stakedPercent := stakedAtoms.Quo(allAtoms)
+				acc.AtomStakedPercent = stakedPercent
 
-				baseNibiru, err := allGames.ApproxSqrt()
-				if err != nil {
-					panic(fmt.Sprintf("failed to root game balance: %s", err))
-				}
-				acc.NibiruBalanceBase = baseNibiru.RoundInt()
-
-				bonusNibiru := baseNibiru.Mul(onePointFive).Mul(stakedPercent)
-				acc.NibiruBalanceBonus = bonusNibiru.RoundInt()
-
-				allOsmo := baseNibiru.Add(bonusNibiru)
-				// nibiruBalance = sqrt( all games) * (1 + 1.5) * (staked game percent) =
-				acc.NibiruBalance = allOsmo.RoundInt()
-
-				if allGames.LTE(sdk.NewDec(1000000)) {
-					acc.NibiruBalanceBase = sdk.ZeroInt()
-					acc.NibiruBalanceBonus = sdk.ZeroInt()
-					acc.NibiruBalance = sdk.ZeroInt()
-				}
-
-				totalNibiruBalance = totalNibiruBalance.Add(acc.NibiruBalance)
+				acc.GameBalance = sdk.Int(acc.AtomOwnershipPercent.MulInt(sdk.NewInt(MaxCap)))
 
 				snapshotAccs[address] = acc
 			}
 
-			// iterate to find Osmo ownership percentage per account
+			// iterate to find game ownership percentage per account
 			for address, acc := range snapshotAccs {
-				acc.NibiruPercent = acc.NibiruBalance.ToDec().Quo(totalNibiruBalance.ToDec())
+				// acc.GamePercent = acc.GameBalance.ToDec().Quo(totalOsmoBalance.ToDec())
 				snapshotAccs[address] = acc
 			}
 
 			snapshot := Snapshot{
-				TotalGameAmount:          totalGameBalance,
-				TotalNibiruAirdropAmount: totalNibiruBalance,
-				NumberAccounts:           uint64(len(snapshotAccs)),
-				Accounts:                 snapshotAccs,
+				TotalAtomAmount:        totalAtomBalance,
+				TotalGameAirdropAmount: sdk.NewInt(TotalGameAirdropAmount),
+				NumberAccounts:         uint64(len(snapshotAccs)),
+				Denominator:            denominator,
+				Accounts:               snapshotAccs,
 			}
 
 			fmt.Printf("# accounts: %d\n", len(snapshotAccs))
-			fmt.Printf("gameTotalSupply: %s\n", totalGameBalance.String())
-			fmt.Printf("nibiruTotalSupply: %s\n", totalNibiruBalance.String())
+			fmt.Printf("atomTotalSupply: %s\n", totalAtomBalance.String())
+			fmt.Printf("gameTotalSupply: %s\n", sdk.NewInt(TotalGameAirdropAmount).String())
 
 			// export snapshot json
 			snapshotJSON, err := json.MarshalIndent(snapshot, "", "    ")
