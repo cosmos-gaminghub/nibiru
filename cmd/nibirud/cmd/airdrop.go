@@ -85,19 +85,7 @@ Example:
 				totalAtomBalance = totalAtomBalance.Add(balance)
 
 				// sum all sqrt of min(balance, max cap)
-				if balance.ToDec().GTE(sdk.NewDec(MaxCap)) {
-					atomSqrt, err := sdk.NewInt(MaxCap).ToDec().ApproxSqrt()
-					if err != nil {
-						panic(fmt.Sprintf("failed to root atom balance: %s", err))
-					}
-					denominator = denominator.Add(atomSqrt.RoundInt())
-				} else {
-					atomSqrt, err := balance.ToDec().ApproxSqrt()
-					if err != nil {
-						panic(fmt.Sprintf("failed to root atom balance: %s", err))
-					}
-					denominator = denominator.Add(atomSqrt.RoundInt())
-				}
+				denominator = denominator.Add(getMin(balance.ToDec()).RoundInt())
 
 				snapshotAccs[account.Address] = SnapshotAccount{
 					AtomAddress:         account.Address,
@@ -150,12 +138,10 @@ Example:
 
 			for address, acc := range snapshotAccs {
 				allAtoms := acc.AtomBalance.ToDec()
-				allAtomSqrt, err := allAtoms.ApproxSqrt()
-				if err != nil {
-					panic(fmt.Sprintf("failed to root atom balance: %s", err))
-				}
 
-				acc.AtomOwnershipPercent = allAtomSqrt.QuoInt(denominator)
+				allAtomSqrt := getMin(allAtoms).RoundInt()
+
+				acc.AtomOwnershipPercent = allAtomSqrt.ToDec().QuoInt(denominator)
 
 				if allAtoms.IsZero() {
 					acc.AtomStakedPercent = sdk.ZeroDec()
@@ -168,14 +154,8 @@ Example:
 				stakedPercent := stakedAtoms.Quo(allAtoms)
 				acc.AtomStakedPercent = stakedPercent
 
-				acc.GameBalance = sdk.Int(acc.AtomOwnershipPercent.MulInt(sdk.NewInt(MaxCap)))
+				acc.GameBalance = acc.AtomOwnershipPercent.MulInt(sdk.NewInt(TotalGameAirdropAmount)).RoundInt()
 
-				snapshotAccs[address] = acc
-			}
-
-			// iterate to find game ownership percentage per account
-			for address, acc := range snapshotAccs {
-				// acc.GamePercent = acc.GameBalance.ToDec().Quo(totalOsmoBalance.ToDec())
 				snapshotAccs[address] = acc
 			}
 
@@ -205,4 +185,20 @@ Example:
 	flags.AddQueryFlagsToCmd(cmd)
 
 	return cmd
+}
+
+func getMin(balance sdk.Dec) sdk.Dec {
+	if balance.GTE(sdk.NewDec(MaxCap)) {
+		atomSqrt, err := sdk.NewInt(MaxCap).ToDec().ApproxSqrt()
+		if err != nil {
+			panic(fmt.Sprintf("failed to root atom balance: %s", err))
+		}
+		return atomSqrt
+	} else {
+		atomSqrt, err := balance.ApproxSqrt()
+		if err != nil {
+			panic(fmt.Sprintf("failed to root atom balance: %s", err))
+		}
+		return atomSqrt
+	}
 }
