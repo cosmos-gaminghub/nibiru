@@ -82,6 +82,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		genutilcli.GenTxCmd(nibiru.ModuleBasics, encodingConfig.TxConfig, banktypes.GenesisBalancesIterator{}, nibiru.DefaultNodeHome),
 		genutilcli.ValidateGenesisCmd(nibiru.ModuleBasics),
 		AddGenesisAccountCmd(nibiru.DefaultNodeHome),
+		ExportAirdropSnapshotCmd(),
 		tmcli.NewCompletionCmd(rootCmd, true),
 		testnetCmd(nibiru.ModuleBasics, banktypes.GenesisBalancesIterator{}),
 		debug.Cmd(),
