@@ -3,12 +3,15 @@ package types
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
+	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	// this line is used by starport scaffolding # 1
 	"github.com/cosmos/cosmos-sdk/types/msgservice"
+	// this line is used by starport scaffolding # 1
 )
 
-func RegisterCodec(cdc *codec.LegacyAmino) {
+// RegisterLegacyAminoCodec registers the account interfaces and concrete types on the
+// provided LegacyAmino codec. These types are used for Amino JSON serialization
+func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgIssueDenom{}, "cosmminden/MsgIssueDenom", nil)
 	cdc.RegisterConcrete(&MsgMintNFT{}, "cosmminden/MsgMintNFT", nil)
 	cdc.RegisterConcrete(&MsgEditNFT{}, "cosmminden/MsgEditNFT", nil)
@@ -34,3 +37,8 @@ var (
 	amino     = codec.NewLegacyAmino()
 	ModuleCdc = codec.NewProtoCodec(cdctypes.NewInterfaceRegistry())
 )
+
+func init() {
+	RegisterLegacyAminoCodec(amino)
+	cryptocodec.RegisterCrypto(amino)
+}

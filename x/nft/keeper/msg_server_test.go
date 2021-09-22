@@ -16,63 +16,61 @@ func setupMsgServer(t testing.TB) (types.MsgServer, context.Context) {
 	return NewMsgServerImpl(*keeper), sdk.WrapSDKContext(ctx)
 }
 
-func TestMsgIssueDenom(t *testing.T) {
-	var (
-		srv, ctx = setupMsgServer(t)
-	)
-	_, err := srv.IssueDenom(ctx, &types.MsgIssueDenom{"denomid", "name", "schema", testutil.CreateTestAddrs(1)[0].String()})
-	require.NoError(t, err)
-}
-
-func TestMsgMintNFT(t *testing.T) {
-	var (
-		srv, ctx   = setupMsgServer(t)
-		denomID    = "denomID"
-		owner      = testutil.CreateTestAddrs(1)[0].String()
-		expectedId = uint64(types.MIN_TOKEN_ID)
-	)
-	srv.IssueDenom(ctx, &types.MsgIssueDenom{denomID, "name", "schema", owner})
-	resp, err := srv.MintNFT(ctx, &types.MsgMintNFT{denomID, "name", "uri", "data", owner, owner})
-	require.NoError(t, err)
-	assert.Equal(t, expectedId, resp.Id)
-}
-
-func TestMsgEditNFT(t *testing.T) {
-	var (
-		srv, ctx = setupMsgServer(t)
-		denomID  = "denomID"
-		tokenid  = uint64(types.MIN_TOKEN_ID)
-		owner    = testutil.CreateTestAddrs(1)[0].String()
-	)
-	srv.IssueDenom(ctx, &types.MsgIssueDenom{denomID, "name", "schema", owner})
-	srv.MintNFT(ctx, &types.MsgMintNFT{denomID, "name", "uri", "data", owner, owner})
-	_, err := srv.EditNFT(ctx, &types.MsgEditNFT{denomID, tokenid, "name2", "data2", owner})
-	require.NoError(t, err)
-}
-
-func TestMsgTransferNFT(t *testing.T) {
+func TestMsgIssueDenomMintEditTransferBurnNFT(t *testing.T) {
 	var (
 		srv, ctx  = setupMsgServer(t)
 		denomID   = "denomID"
-		tokenid   = uint64(types.MIN_TOKEN_ID)
+		tokenID   = uint64(types.MIN_TOKEN_ID)
 		owner     = testutil.CreateTestAddrs(1)[0].String()
 		receipent = testutil.CreateTestAddrs(2)[1].String()
+		err       error
 	)
-	srv.IssueDenom(ctx, &types.MsgIssueDenom{denomID, "name", "schema", owner})
-	srv.MintNFT(ctx, &types.MsgMintNFT{denomID, "name", "uri", "data", owner, owner})
-	_, err := srv.TransferNFT(ctx, &types.MsgTransferNFT{denomID, tokenid, owner, receipent})
-	require.NoError(t, err)
-}
 
-func TestMsgBurnNFT(t *testing.T) {
-	var (
-		srv, ctx = setupMsgServer(t)
-		denomID  = "denomID"
-		tokenid  = uint64(types.MIN_TOKEN_ID)
-		owner    = testutil.CreateTestAddrs(1)[0].String()
-	)
-	srv.IssueDenom(ctx, &types.MsgIssueDenom{denomID, "name", "schema", owner})
-	srv.MintNFT(ctx, &types.MsgMintNFT{denomID, "name", "uri", "data", owner, owner})
-	_, err := srv.BurnNFT(ctx, &types.MsgBurnNFT{denomID, tokenid, owner})
+	//------test IssueDenom()-------------
+	_, err = srv.IssueDenom(ctx, &types.MsgIssueDenom{
+		DenomId: denomID,
+		Name:    "name",
+		Schema:  "schema",
+		Sender:  owner,
+	})
+	require.NoError(t, err)
+
+	//------test MintNFT()-------------
+	resp, err := srv.MintNFT(ctx, &types.MsgMintNFT{
+		DenomId:   denomID,
+		Name:      "name",
+		URI:       "uri",
+		Data:      "data",
+		Sender:    owner,
+		Recipient: owner,
+	})
+	require.NoError(t, err)
+	assert.Equal(t, tokenID, resp.Id)
+
+	//------test EditNFT()-------------
+	_, err = srv.EditNFT(ctx, &types.MsgEditNFT{
+		DenomId: denomID,
+		Id:      tokenID,
+		Name:    "name2",
+		Data:    "data2",
+		Sender:  owner,
+	})
+	require.NoError(t, err)
+
+	//------test TransferNFT()-------------
+	_, err = srv.TransferNFT(ctx, &types.MsgTransferNFT{
+		DenomId:   denomID,
+		Id:        tokenID,
+		Sender:    owner,
+		Recipient: receipent,
+	})
+	require.NoError(t, err)
+
+	//------test BurnNFT()-------------
+	_, err = srv.BurnNFT(ctx, &types.MsgBurnNFT{
+		DenomId: denomID,
+		Id:      tokenID,
+		Sender:  receipent,
+	})
 	require.NoError(t, err)
 }

@@ -47,7 +47,8 @@ func TestNewTokenID(t *testing.T) {
 		denomID     = "denomID"
 	)
 
-	keeper.IssueDenom(ctx, types.NewMsgIssueDenom(denomID, "name", "schema", owner.String()))
+	err := keeper.IssueDenom(ctx, types.NewMsgIssueDenom(denomID, "name", "schema", owner.String()))
+	require.NoError(t, err)
 
 	for _, tc := range []struct {
 		desc       string
@@ -72,7 +73,8 @@ func TestNewTokenID(t *testing.T) {
 			desc:    "second id",
 			denomID: denomID,
 			prepare: func() {
-				keeper.MintNFT(ctx, types.NewMsgMintNFT(denomID, "name", "token-uri", "data", owner.String(), owner.String()))
+				_, err := keeper.MintNFT(ctx, types.NewMsgMintNFT(denomID, "name", "token-uri", "data", owner.String(), owner.String()))
+				require.NoError(t, err)
 			},
 			expectedID: types.TokenID(types.MIN_TOKEN_ID + 1),
 		},
