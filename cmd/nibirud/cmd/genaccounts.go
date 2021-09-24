@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"os"
 
 	"github.com/spf13/cobra"
 
@@ -183,6 +185,169 @@ contain valid denominations. Accounts may optionally be supplied with vesting pa
 	cmd.Flags().String(flagVestingAmt, "", "amount of coins for vesting accounts")
 	cmd.Flags().Int64(flagVestingStart, 0, "schedule start time (unix epoch) for vesting accounts")
 	cmd.Flags().Int64(flagVestingEnd, 0, "schedule end time (unix epoch) for vesting accounts")
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func ImportGenesisAccountsFromSnapshotCmd(defaultNodeHome string) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "import-genesis-accounts-from-snapshot [input-snapshot-file] [input-games-file]",
+		Short: "Import genesis accounts from fairdrop snapshot.json and an games.json",
+		Long: `Import genesis accounts from fairdrop snapshot.json
+		20% of airdrop amount is liquid in accounts.
+		The remaining is placed in the claims module.
+		Must also pass in an games.json file to airdrop genesis games
+		Example:
+		nibirud import-genesis-accounts-from-snapshot ../snapshot.json ../games.json
+		- Check input genesis:
+			file is at ~/.nibirud/config/genesis.json
+`,
+		Args: cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+
+			// aminoCodec := clientCtx.LegacyAmino.Amino
+
+			clientCtx := client.GetClientContextFromCmd(cmd)
+			serverCtx := server.GetServerContextFromCmd(cmd)
+
+			config := serverCtx.Config
+
+			config.SetRoot(clientCtx.HomeDir)
+
+			genFile := config.GenesisFile()
+			appState, genDoc, err := genutiltypes.GenesisStateFromGenFile(genFile)
+			if err != nil {
+				return fmt.Errorf("failed to unmarshal genesis state: %w", err)
+			}
+
+			authGenState := authtypes.GetGenesisStateFromAppState(clientCtx.Codec, appState)
+
+			accs, err := authtypes.UnpackAccounts(authGenState.Accounts)
+			if err != nil {
+				return fmt.Errorf("failed to get accounts from any: %w", err)
+			}
+
+			// Read snapshot file
+			snapshotInput := args[0]
+			snapshotJSON, err := os.Open(snapshotInput)
+			if err != nil {
+				return err
+			}
+			defer snapshotJSON.Close()
+			byteValue, _ := ioutil.ReadAll(snapshotJSON)
+			snapshot := Snapshot{}
+			json.Unmarshal(byteValue, &snapshot)
+			if err != nil {
+				return err
+			}
+
+			// Read ions file
+			ionInput := args[1]
+			ionJSON, err := os.Open(ionInput)
+			if err != nil {
+				return err
+			}
+			defer ionJSON.Close()
+			byteValue2, _ := ioutil.ReadAll(ionJSON)
+			var gameAmts map[string]int64
+			json.Unmarshal(byteValue2, &gameAmts)
+			if err != nil {
+				return err
+			}
+
+			// get genesis params
+			genesisParams := MainnetGenesisParams()
+			nonAirdropAccs := make(map[string]sdk.Coins)
+
+			for _, acc := range genesisParams.DistributedAccounts {
+				nonAirdropAccs[acc.Address] = acc.GetCoins()
+			}
+
+			for addr, amt := range gameAmts {
+				address, err := sdk.AccAddressFromBech32(addr)
+				if err != nil {
+					return err
+				}
+
+				if val, ok := nonAirdropAccs[address.String()]; ok {
+					nonAirdropAccs[address.String()] = val.Add(sdk.NewCoin("game", sdk.NewInt(amt).MulRaw(1_000_000)))
+				} else {
+					nonAirdropAccs[address.String()] = sdk.NewCoins(sdk.NewCoin("game", sdk.NewInt(amt).MulRaw(1_000_000)))
+				}
+			}
+
+			// figure out normalizationFactor to normalize snapshot balances to desired airdrop supply
+			normalizationFactor := genesisParams.AirdropSupply.ToDec().QuoInt(snapshot.TotalGameAirdropAmount)
+			fmt.Printf("normalization factor: %s\n", normalizationFactor)
+
+			// for each account in the snapshot
+			for _, acc := range snapshot.Accounts {
+
+				// read address from snapshot
+				address, err := sdk.AccAddressFromBech32(acc.AtomAddress)
+				if err != nil {
+					return err
+				}
+
+				// Add the new account to the set of genesis accounts
+				baseAccount := authtypes.NewBaseAccount(address, nil, 0, 0)
+				if err := baseAccount.Validate(); err != nil {
+					return fmt.Errorf("failed to validate new genesis account: %w", err)
+				}
+				accs = append(accs, baseAccount)
+			}
+
+			// distribute remaining game to accounts not in fairdrop
+			for addr, _ := range nonAirdropAccs {
+				// read address from snapshot
+				address, err := sdk.AccAddressFromBech32(addr)
+				if err != nil {
+					return err
+				}
+
+				// Add the new account to the set of genesis accounts
+				baseAccount := authtypes.NewBaseAccount(address, nil, 0, 0)
+				if err := baseAccount.Validate(); err != nil {
+					return fmt.Errorf("failed to validate new genesis account: %w", err)
+				}
+				accs = append(accs, baseAccount)
+			}
+			// auth module genesis
+			accs = authtypes.SanitizeGenesisAccounts(accs)
+			genAccs, err := authtypes.PackAccounts(accs)
+			if err != nil {
+				return fmt.Errorf("failed to convert accounts into any's: %w", err)
+			}
+			authGenState.Accounts = genAccs
+			authGenStateBz, err := clientCtx.Codec.MarshalJSON(&authGenState)
+			if err != nil {
+				return fmt.Errorf("failed to marshal auth genesis state: %w", err)
+			}
+			appState[authtypes.ModuleName] = authGenStateBz
+
+			// bank module genesis
+			bankGenState := banktypes.GetGenesisStateFromAppState(clientCtx.Codec, appState)
+			liquidBalances := bankGenState.Balances
+			bankGenState.Balances = banktypes.SanitizeGenesisBalances(liquidBalances)
+			bankGenStateBz, err := clientCtx.Codec.MarshalJSON(bankGenState)
+			if err != nil {
+				return fmt.Errorf("failed to marshal bank genesis state: %w", err)
+			}
+			appState[banktypes.ModuleName] = bankGenStateBz
+
+			appStateJSON, err := json.Marshal(appState)
+			if err != nil {
+				return fmt.Errorf("failed to marshal application genesis state: %w", err)
+			}
+			genDoc.AppState = appStateJSON
+
+			err = genutil.ExportGenesisFile(genDoc, genFile)
+			return err
+		},
+	}
+
+	cmd.Flags().String(flags.FlagHome, defaultNodeHome, "The application home directory")
 	flags.AddQueryFlagsToCmd(cmd)
 
 	return cmd
