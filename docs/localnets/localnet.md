@@ -47,16 +47,12 @@ $ sed -i "" "s/\"stake\"/\"game\"/g" ~/.nibiru/config/genesis.json
 
 **Configure your CLI to eliminate need for chain-id flag**
 
-::: warning
-**v0.3** is not ready this command
-:::
 
-
+Set defalut config value like `chain-id` to skip putting flag when broadcasting the transactions.
 ```sh
 $ nibirud config chain-id testchain
 $ nibirud config output json
-$ nibirud config indent true
-$ nibirud config trust-node true
+$ nibirud config keyring-backend test
 ```
 
 Ready for start

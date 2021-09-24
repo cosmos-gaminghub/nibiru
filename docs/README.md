@@ -5,7 +5,7 @@
   <img src="./welcome.png">
 </p>
 
-Cosmos Gaming Hub is a fair and secure distributed game platform that supports the development of new games and makes it easier to trade valuable data such as items, weapons and armor in the game. Items, weapons, armors etc in the games will be distributed to the market as uniquely defined tokens on the Cosmos Gaming Hub chain, enabling transactions that do not require third parties. Unlike the conventional centralized game structure, Cosmos Gaming Hub creates new value for data in a game virtual space because token ownership does not belong to the game operator. The new value created in virtual space has the potential to start to have more realistic value in the future, and to create a larger economy.
+GAME is a fair and secure distributed game platform that supports the development of new games and makes it easier to trade valuable data such as items, weapons and armor in the game. Items, weapons, armors etc in the games will be distributed to the market as uniquely defined tokens on the GAME Hub, enabling transactions that do not require third parties. Unlike the conventional centralized game structure, GAME creates new value for data in a game virtual space because token ownership does not belong to the game operator. The new value created in virtual space has the potential to start to have more realistic value in the future, and to create a larger economy.
 
 
 ## Get Started
