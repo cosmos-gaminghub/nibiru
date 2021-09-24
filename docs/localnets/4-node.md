@@ -1,7 +1,7 @@
 # Start 4 Node
 
 ::: warning
-This is v0.2 instruction, v0.3 instruction and its testnet are comming soon.
+This is v0.2 instruction, latest instruction is comming soon.
 :::
 
 :::tip Required
