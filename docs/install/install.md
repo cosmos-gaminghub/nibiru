@@ -38,7 +38,7 @@ With `golang`, you can compile and run `nibiru`.
 
 ```sh
 git clone https://github.com/cosmos-gaminghub/nibiru.git
-cd nibiru && git checkout -b tag0.3 tags/v0.3
+cd nibiru && git checkout -b tag0.4 tags/v0.4
 make install
 ```
 
@@ -46,4 +46,8 @@ Try `nibirud version` to verify that everything is fine.
 
 ::: tip Tips
 If you are using ubuntu, make sure to install build tools with the command `apt install build-essential` before `make install`.
+:::
+
+::: tip Tips
+If you want to use a ledger device, make sure to set `LEDGER_ENABLED`. Ex: `LEDGER_ENABLED=true make install`.
 :::
