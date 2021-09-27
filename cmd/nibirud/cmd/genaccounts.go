@@ -243,13 +243,13 @@ func ImportGenesisAccountsFromSnapshotCmd(defaultNodeHome string) *cobra.Command
 			}
 
 			// Read ions file
-			ionInput := args[1]
-			ionJSON, err := os.Open(ionInput)
+			gameInput := args[1]
+			gameJSON, err := os.Open(gameInput)
 			if err != nil {
 				return err
 			}
-			defer ionJSON.Close()
-			byteValue2, _ := ioutil.ReadAll(ionJSON)
+			defer gameJSON.Close()
+			byteValue2, _ := ioutil.ReadAll(gameJSON)
 			var gameAmts map[string]int64
 			json.Unmarshal(byteValue2, &gameAmts)
 			if err != nil {

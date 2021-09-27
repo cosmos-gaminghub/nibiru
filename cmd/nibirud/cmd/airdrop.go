@@ -141,7 +141,11 @@ Example:
 
 				allAtomSqrt := getMin(allAtoms).RoundInt()
 
-				acc.AtomOwnershipPercent = allAtomSqrt.ToDec().QuoInt(denominator)
+				if denominator.Int64() == 0 {
+					acc.AtomOwnershipPercent = sdk.NewInt(0).ToDec()
+				} else {
+					acc.AtomOwnershipPercent = allAtomSqrt.ToDec().QuoInt(denominator)
+				}
 
 				if allAtoms.IsZero() {
 					acc.AtomStakedPercent = sdk.ZeroDec()
