@@ -191,6 +191,7 @@ Example:
 	return cmd
 }
 
+// compare balance with max cap
 func getMin(balance sdk.Dec) sdk.Dec {
 	if balance.GTE(sdk.NewDec(MaxCap)) {
 		atomSqrt, err := sdk.NewInt(MaxCap).ToDec().ApproxSqrt()
