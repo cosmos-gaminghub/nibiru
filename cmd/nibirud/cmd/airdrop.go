@@ -47,8 +47,8 @@ type SnapshotAccount struct {
 func ExportAirdropSnapshotCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "export-airdrop-snapshot [airdrop-to-denom] [input-genesis-file] [output-snapshot-json] --nibiru-supply=[nibiru-genesis-supply]",
-		Short: "Export a quadratic fairdrop snapshot from a provided cosmos-sdk v0.44 genesis export",
-		Long: `Export a quadratic fairdrop snapshot from a provided cosmos-sdk v0.44 genesis export
+		Short: "Export a quadratic fairdrop snapshot from a provided cosmos-sdk v0.42 genesis export",
+		Long: `Export a quadratic fairdrop snapshot from a provided cosmos-sdk v0.42 genesis export
 Example:
 	nibirud export-airdrop-snapshot uatom ~/.nibiru/config/genesis.json ../snapshot.json --nibiru-supply=100000000000000
 	- Check input genesis:
@@ -99,7 +99,8 @@ Example:
 				address := unbonding.DelegatorAddress
 				acc, ok := snapshotAccs[address]
 				if !ok {
-					panic("no account found for unbonding")
+					fmt.Printf("No account found for unbonding %s \n", address)
+					continue
 				}
 
 				unbondingAtoms := sdk.NewInt(0)
@@ -113,7 +114,7 @@ Example:
 				snapshotAccs[address] = acc
 			}
 
-			// Make a map from validator operator address to the v44 validator type
+			// Make a map from validator operator address to the v42 validator type
 			validators := make(map[string]stakingtypes.Validator)
 			for _, validator := range stakingGenState.Validators {
 				validators[validator.OperatorAddress] = validator
@@ -124,7 +125,8 @@ Example:
 
 				acc, ok := snapshotAccs[address]
 				if !ok {
-					panic("no account found for delegation")
+					fmt.Printf("No account found for delegation address %s \n", address)
+					continue
 				}
 
 				val := validators[delegation.ValidatorAddress]
