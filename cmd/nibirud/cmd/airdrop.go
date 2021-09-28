@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	MaxCap                 = 5000
+	MaxCap                 = 50000
 	TotalGameAirdropAmount = 1000000 // 0.5% * 200000000
 )
 
