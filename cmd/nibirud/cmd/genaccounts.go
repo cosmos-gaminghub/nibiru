@@ -288,11 +288,9 @@ func ImportGenesisAccountsFromSnapshotCmd(defaultNodeHome string) *cobra.Command
 			normalizationFactor := genesisParams.AirdropSupply.ToDec().QuoInt(snapshot.TotalGameAirdropAmount)
 			fmt.Printf("normalization factor: %s\n", normalizationFactor)
 
-			bankGenState := banktypes.GetGenesisStateFromAppState(clientCtx.Codec, appState)
-
-			liquidBalances := bankGenState.Balances
-
 			// for each account in the snapshot
+			bankGenState := banktypes.GetGenesisStateFromAppState(clientCtx.Codec, appState)
+			liquidBalances := bankGenState.Balances
 			for _, acc := range snapshot.Accounts {
 				// read address from snapshot
 				bech32Addr, err := app.ConvertBech32(acc.AtomAddress)
@@ -318,6 +316,7 @@ func ImportGenesisAccountsFromSnapshotCmd(defaultNodeHome string) *cobra.Command
 					Address: address.String(),
 					Coins:   liquidCoins,
 				})
+				bankGenState.Supply = bankGenState.Supply.Add(liquidCoins...)
 
 				// Add the new account to the set of genesis accounts
 				baseAccount := authtypes.NewBaseAccount(address, nil, 0, 0)
@@ -328,12 +327,18 @@ func ImportGenesisAccountsFromSnapshotCmd(defaultNodeHome string) *cobra.Command
 			}
 
 			// distribute remaining game to accounts not in fairdrop
-			for addr, _ := range nonAirdropAccs {
+			for addr, coin := range nonAirdropAccs {
 				// read address from snapshot
 				address, err := sdk.AccAddressFromBech32(addr)
 				if err != nil {
 					return err
 				}
+
+				liquidBalances = append(liquidBalances, banktypes.Balance{
+					Address: address.String(),
+					Coins:   coin,
+				})
+				bankGenState.Supply = bankGenState.Supply.Add(coin...)
 
 				// Add the new account to the set of genesis accounts
 				baseAccount := authtypes.NewBaseAccount(address, nil, 0, 0)
