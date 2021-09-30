@@ -288,6 +288,10 @@ func ImportGenesisAccountsFromSnapshotCmd(defaultNodeHome string) *cobra.Command
 			normalizationFactor := genesisParams.AirdropSupply.ToDec().QuoInt(snapshot.TotalGameAirdropAmount)
 			fmt.Printf("normalization factor: %s\n", normalizationFactor)
 
+			bankGenState := banktypes.GetGenesisStateFromAppState(clientCtx.Codec, appState)
+
+			liquidBalances := bankGenState.Balances
+
 			// for each account in the snapshot
 			for _, acc := range snapshot.Accounts {
 				// read address from snapshot
@@ -300,6 +304,20 @@ func ImportGenesisAccountsFromSnapshotCmd(defaultNodeHome string) *cobra.Command
 				if err != nil {
 					return err
 				}
+
+				// initial liquid amounts
+				// We consistently round down to the nearest uosmo
+				liquidCoins := sdk.NewCoins(sdk.NewCoin(genesisParams.NativeCoinMetadatas[0].Base, acc.GameBalance))
+
+				if coins, ok := nonAirdropAccs[address.String()]; ok {
+					liquidCoins = liquidCoins.Add(coins...)
+					delete(nonAirdropAccs, address.String())
+				}
+
+				liquidBalances = append(liquidBalances, banktypes.Balance{
+					Address: address.String(),
+					Coins:   liquidCoins,
+				})
 
 				// Add the new account to the set of genesis accounts
 				baseAccount := authtypes.NewBaseAccount(address, nil, 0, 0)
@@ -338,8 +356,6 @@ func ImportGenesisAccountsFromSnapshotCmd(defaultNodeHome string) *cobra.Command
 			appState[authtypes.ModuleName] = authGenStateBz
 
 			// bank module genesis
-			bankGenState := banktypes.GetGenesisStateFromAppState(clientCtx.Codec, appState)
-			liquidBalances := bankGenState.Balances
 			bankGenState.Balances = banktypes.SanitizeGenesisBalances(liquidBalances)
 			bankGenStateBz, err := clientCtx.Codec.MarshalJSON(bankGenState)
 			if err != nil {
