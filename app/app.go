@@ -28,6 +28,7 @@ import (
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	store "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/bech32"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth"
@@ -772,4 +773,17 @@ func SetCosmosBech32Prefixes(config *sdk.Config) {
 	config.SetBech32PrefixForAccount(defaultConfig.GetBech32AccountAddrPrefix(), defaultConfig.GetBech32AccountPubPrefix())
 	config.SetBech32PrefixForValidator(defaultConfig.GetBech32ValidatorAddrPrefix(), defaultConfig.GetBech32ValidatorPubPrefix())
 	config.SetBech32PrefixForConsensusNode(defaultConfig.GetBech32ConsensusAddrPrefix(), defaultConfig.GetBech32ConsensusPubPrefix())
+}
+
+func ConvertBech32(address string) (string, error) {
+	_, bz, err := bech32.DecodeAndConvert(address)
+	if err != nil {
+		panic(err)
+	}
+
+	bech32Addr, err := bech32.ConvertAndEncode(Bech32MainPrefix, bz)
+	if err != nil {
+		panic(err)
+	}
+	return bech32Addr, err
 }
