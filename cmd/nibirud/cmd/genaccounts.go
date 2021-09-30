@@ -8,6 +8,8 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/cosmos-gaminghub/nibiru/app"
+	appparams "github.com/cosmos-gaminghub/nibiru/app/params"
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -265,10 +267,16 @@ func ImportGenesisAccountsFromSnapshotCmd(defaultNodeHome string) *cobra.Command
 			}
 
 			for addr, amt := range gameAmts {
+				config := sdk.GetConfig()
+
+				// set atom bech32 prefixes
+				app.SetCosmosBech32Prefixes(config)
 				address, err := sdk.AccAddressFromBech32(addr)
 				if err != nil {
 					return err
 				}
+
+				app.SetBech32AddressPrefixes(config)
 
 				if val, ok := nonAirdropAccs[address.String()]; ok {
 					nonAirdropAccs[address.String()] = val.Add(sdk.NewCoin("game", sdk.NewInt(amt).MulRaw(1_000_000)))
@@ -283,12 +291,20 @@ func ImportGenesisAccountsFromSnapshotCmd(defaultNodeHome string) *cobra.Command
 
 			// for each account in the snapshot
 			for _, acc := range snapshot.Accounts {
+				// set atom bech32 prefixes
+				config := sdk.GetConfig()
+
+				// set atom bech32 prefixes
+				app.SetCosmosBech32Prefixes(config)
 
 				// read address from snapshot
 				address, err := sdk.AccAddressFromBech32(acc.AtomAddress)
 				if err != nil {
 					return err
 				}
+
+				// set osmo bech32 prefixes
+				appparams.SetAddressPrefixes()
 
 				// Add the new account to the set of genesis accounts
 				baseAccount := authtypes.NewBaseAccount(address, nil, 0, 0)
