@@ -291,6 +291,8 @@ func ImportGenesisAccountsFromSnapshotCmd(defaultNodeHome string) *cobra.Command
 			// for each account in the snapshot
 			bankGenState := banktypes.GetGenesisStateFromAppState(clientCtx.Codec, appState)
 			liquidBalances := bankGenState.Balances
+			supply := bankGenState.Supply
+			fmt.Println(supply.AmountOf("game"))
 			for _, acc := range snapshot.Accounts {
 				// read address from snapshot
 				bech32Addr, err := app.ConvertBech32(acc.AtomAddress)
@@ -316,7 +318,7 @@ func ImportGenesisAccountsFromSnapshotCmd(defaultNodeHome string) *cobra.Command
 					Address: address.String(),
 					Coins:   liquidCoins,
 				})
-				bankGenState.Supply = bankGenState.Supply.Add(liquidCoins...)
+				supply = supply.Add(liquidCoins...)
 
 				// Add the new account to the set of genesis accounts
 				baseAccount := authtypes.NewBaseAccount(address, nil, 0, 0)
@@ -324,7 +326,16 @@ func ImportGenesisAccountsFromSnapshotCmd(defaultNodeHome string) *cobra.Command
 					return fmt.Errorf("failed to validate new genesis account: %w", err)
 				}
 				accs = append(accs, baseAccount)
+
 			}
+			fmt.Println(supply.AmountOf("game"))
+
+			var total sdk.Coins
+			for _, balance := range liquidBalances {
+				total = total.Add(balance.Coins...)
+			}
+
+			fmt.Println(total)
 
 			// distribute remaining game to accounts not in fairdrop
 			for addr, coin := range nonAirdropAccs {
@@ -338,7 +349,7 @@ func ImportGenesisAccountsFromSnapshotCmd(defaultNodeHome string) *cobra.Command
 					Address: address.String(),
 					Coins:   coin,
 				})
-				bankGenState.Supply = bankGenState.Supply.Add(coin...)
+				supply = supply.Add(coin...)
 
 				// Add the new account to the set of genesis accounts
 				baseAccount := authtypes.NewBaseAccount(address, nil, 0, 0)
@@ -362,6 +373,7 @@ func ImportGenesisAccountsFromSnapshotCmd(defaultNodeHome string) *cobra.Command
 
 			// bank module genesis
 			bankGenState.Balances = banktypes.SanitizeGenesisBalances(liquidBalances)
+			bankGenState.Supply = supply
 			bankGenStateBz, err := clientCtx.Codec.MarshalJSON(bankGenState)
 			if err != nil {
 				return fmt.Errorf("failed to marshal bank genesis state: %w", err)

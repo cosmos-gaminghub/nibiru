@@ -7,6 +7,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/server"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -42,6 +43,7 @@ type SnapshotAccount struct {
 	AtomStakedPercent   sdk.Dec `json:"atom_staked_percent"`
 
 	GameBalance sdk.Int `json:"game_balance"`
+	Denominator sdk.Int `json:"denominator"`
 }
 
 type Account struct {
@@ -82,21 +84,23 @@ Example:
 			stakingGenState := stakingtypes.GetGenesisStateFromAppState(clientCtx.Codec, appState)
 			authGenState := authtypes.GetGenesisStateFromAppState(clientCtx.Codec, appState)
 
-			snapshotAccs := make(map[string]SnapshotAccount)
+			snapshotAccs := make(map[string]SnapshotAccount, len(authGenState.GetAccounts()))
 			for _, account := range authGenState.GetAccounts() {
 
 				if account.TypeUrl == "/cosmos.auth.v1beta1.BaseAccount" {
-					acc, ok := account.GetCachedValue().(authtypes.GenesisAccount)
+					_, ok := account.GetCachedValue().(authtypes.GenesisAccount)
 					if ok {
 						var byteAccounts []byte
 						// Reason is prefix is nibiru --> getAddress will be empty
 						// Marshal construct and convert to new struct to get address
-						byteAccounts, err := json.Marshal(acc)
+						byteAccounts, err := codec.NewLegacyAmino().MarshalJSON(account.GetCachedValue())
 						if err != nil {
+							fmt.Printf("No account found for bank balance %s \n", string(byteAccounts))
+							fmt.Println(err.Error())
 							continue
 						}
 						var accountAfter Account
-						if err := json.Unmarshal(byteAccounts, &accountAfter); err != nil {
+						if err := codec.NewLegacyAmino().UnmarshalJSON(byteAccounts, &accountAfter); err != nil {
 							continue
 						}
 
@@ -126,10 +130,12 @@ Example:
 				totalAtomBalance = totalAtomBalance.Add(balance)
 
 				// sum all sqrt of min(balance, max cap)
-				denominator = denominator.Add(getMin(balance.ToDec()).RoundInt())
 
+				denomi := getMin(balance.ToDec()).RoundInt()
 				acc.AtomBalance = acc.AtomBalance.Add(balance)
 				acc.AtomUnstakedBalance = acc.AtomUnstakedBalance.Add(balance)
+				acc.Denominator = denomi
+				denominator = denominator.Add(denomi)
 
 				snapshotAccs[account.Address] = acc
 
