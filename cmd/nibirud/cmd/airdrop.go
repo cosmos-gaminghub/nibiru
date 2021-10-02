@@ -9,6 +9,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/server"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
@@ -43,6 +44,12 @@ type SnapshotAccount struct {
 	GameBalance sdk.Int `json:"game_balance"`
 }
 
+type Account struct {
+	Address       string `json:"address,omitempty"`
+	AccountNumber uint64 `json:"account_number,omitempty"`
+	Sequence      uint64 `json:"sequence,omitempty"`
+}
+
 // ExportAirdropSnapshotCmd generates a snapshot.json from a provided cosmos-sdk v0.36 genesis export.
 func ExportAirdropSnapshotCmd() *cobra.Command {
 	cmd := &cobra.Command{
@@ -73,26 +80,59 @@ Example:
 			appState, _, _ := genutiltypes.GenesisStateFromGenFile(genesisFile)
 			bankGenState := banktypes.GetGenesisStateFromAppState(clientCtx.Codec, appState)
 			stakingGenState := stakingtypes.GetGenesisStateFromAppState(clientCtx.Codec, appState)
+			authGenState := authtypes.GetGenesisStateFromAppState(clientCtx.Codec, appState)
+
+			snapshotAccs := make(map[string]SnapshotAccount)
+			for _, account := range authGenState.GetAccounts() {
+
+				if account.TypeUrl == "/cosmos.auth.v1beta1.BaseAccount" {
+					acc, ok := account.GetCachedValue().(authtypes.GenesisAccount)
+					if ok {
+						var byteAccounts []byte
+						// Reason is prefix is nibiru --> getAddress will be empty
+						// Marshal construct and convert to new struct to get address
+						byteAccounts, err := json.Marshal(acc)
+						if err != nil {
+							continue
+						}
+						var accountAfter Account
+						if err := json.Unmarshal(byteAccounts, &accountAfter); err != nil {
+							continue
+						}
+
+						snapshotAccs[accountAfter.Address] = SnapshotAccount{
+							AtomAddress:         accountAfter.Address,
+							AtomBalance:         sdk.ZeroInt(),
+							AtomUnstakedBalance: sdk.ZeroInt(),
+							AtomStakedBalance:   sdk.ZeroInt(),
+						}
+					}
+				}
+
+			}
 
 			// Produce the map of address to total atom balance, both staked and unstaked
-			snapshotAccs := make(map[string]SnapshotAccount)
 
 			totalAtomBalance := sdk.NewInt(0)
 			denominator := sdk.NewInt(0)
 			for _, account := range bankGenState.Balances {
 
+				acc, ok := snapshotAccs[account.Address]
+				if !ok {
+					fmt.Printf("No account found for bank balance %s \n", account.Address)
+					continue
+				}
 				balance := account.Coins.AmountOf(denom)
 				totalAtomBalance = totalAtomBalance.Add(balance)
 
 				// sum all sqrt of min(balance, max cap)
 				denominator = denominator.Add(getMin(balance.ToDec()).RoundInt())
 
-				snapshotAccs[account.Address] = SnapshotAccount{
-					AtomAddress:         account.Address,
-					AtomBalance:         balance,
-					AtomUnstakedBalance: balance,
-					AtomStakedBalance:   sdk.ZeroInt(),
-				}
+				acc.AtomBalance = acc.AtomBalance.Add(balance)
+				acc.AtomUnstakedBalance = acc.AtomUnstakedBalance.Add(balance)
+
+				snapshotAccs[account.Address] = acc
+
 			}
 
 			for _, unbonding := range stakingGenState.UnbondingDelegations {
