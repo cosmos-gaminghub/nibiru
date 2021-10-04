@@ -18,8 +18,8 @@ import (
 )
 
 const (
-	MaxCap                 = 50000
-	TotalGameAirdropAmount = 1000000 // 0.5% * 200000000
+	MaxCap                 = 50000000000
+	TotalGameAirdropAmount = 1000000000000 // 0.5% * 200000000
 )
 
 type Snapshot struct {
@@ -118,6 +118,15 @@ func getMin(balance sdk.Dec) sdk.Dec {
 	}
 }
 
+func getDenominator(snapshotAccs map[string]SnapshotAccount) sdk.Int {
+	denominator := sdk.ZeroInt()
+	for _, acc := range snapshotAccs {
+		allAtoms := acc.AtomBalance.ToDec()
+		denominator = denominator.Add(getMin(allAtoms).RoundInt())
+	}
+	return denominator
+}
+
 func exportSnapShotFromGenesisFile(clientCtx client.Context, genesisFile string, denom string, snapshotOutput string, snapshot Snapshot) Snapshot {
 	appState, _, _ := genutiltypes.GenesisStateFromGenFile(genesisFile)
 	bankGenState := banktypes.GetGenesisStateFromAppState(clientCtx.Codec, appState)
@@ -158,7 +167,6 @@ func exportSnapShotFromGenesisFile(clientCtx client.Context, genesisFile string,
 	// Produce the map of address to total atom balance, both staked and unstaked
 
 	totalAtomBalance := sdk.NewInt(0)
-	denominator := sdk.NewInt(0)
 	for _, account := range bankGenState.Balances {
 
 		acc, ok := snapshotAccs[account.Address]
@@ -169,13 +177,8 @@ func exportSnapShotFromGenesisFile(clientCtx client.Context, genesisFile string,
 		balance := account.Coins.AmountOf(denom)
 		totalAtomBalance = totalAtomBalance.Add(balance)
 
-		// sum all sqrt of min(balance, max cap)
-
-		denomi := getMin(balance.ToDec()).RoundInt()
 		acc.AtomBalance = acc.AtomBalance.Add(balance)
 		acc.AtomUnstakedBalance = acc.AtomUnstakedBalance.Add(balance)
-		acc.Denominator = denomi
-		denominator = denominator.Add(denomi)
 
 		snapshotAccs[account.Address] = acc
 
@@ -224,15 +227,15 @@ func exportSnapShotFromGenesisFile(clientCtx client.Context, genesisFile string,
 		snapshotAccs[address] = acc
 	}
 
+	denominator := getDenominator(snapshotAccs)
 	for address, acc := range snapshotAccs {
 		allAtoms := acc.AtomBalance.ToDec()
 
 		allAtomSqrt := getMin(allAtoms).RoundInt()
 
-		if denominator.Int64() == 0 {
-			acc.AtomOwnershipPercent = sdk.NewInt(0).ToDec()
-		} else {
-			acc.AtomOwnershipPercent = allAtomSqrt.ToDec().QuoInt(denominator)
+		percent := sdk.NewInt(0).ToDec()
+		if denominator.Int64() >= 0 {
+			percent = allAtomSqrt.ToDec().QuoInt(denominator).RoundInt().ToDec()
 		}
 
 		if allAtoms.IsZero() {
@@ -246,6 +249,7 @@ func exportSnapShotFromGenesisFile(clientCtx client.Context, genesisFile string,
 		stakedPercent := stakedAtoms.Quo(allAtoms)
 		acc.AtomStakedPercent = stakedPercent
 
+		acc.AtomOwnershipPercent = percent
 		acc.GameBalance = acc.AtomOwnershipPercent.MulInt(sdk.NewInt(TotalGameAirdropAmount)).RoundInt()
 
 		snapshotAccs[address] = acc
