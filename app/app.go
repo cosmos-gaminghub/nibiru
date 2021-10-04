@@ -158,7 +158,7 @@ var (
 	_ servertypes.Application = (*NibiruApp)(nil)
 )
 
-// GaiaApp extends an ABCI application, but with most of its parameters exported.
+// NibiruApp extends an ABCI application, but with most of its parameters exported.
 // They are exported for convenience in creating helper functions, as object
 // capabilities aren't needed for testing.
 type NibiruApp struct { // nolint: golint
@@ -213,7 +213,7 @@ func init() {
 	DefaultNodeHome = filepath.Join(userHomeDir, ".nibiru")
 }
 
-// NewGaiaApp returns a reference to an initialized Gaia.
+// NewNibiuApp returns a reference to an initialized Nibiru.
 func NewNibiruApp(
 	logger log.Logger,
 	db dbm.DB, traceStore io.Writer,
@@ -615,7 +615,7 @@ func (app *NibiruApp) ModuleAccountAddrs() map[string]bool {
 	return modAccAddrs
 }
 
-// LegacyAmino returns GaiaApp's amino codec.
+// LegacyAmino returns NibiruApp's amino codec.
 //
 // NOTE: This is solely to be used for testing purposes as it may be desirable
 // for modules to register their own custom testing types.
@@ -623,7 +623,7 @@ func (app *NibiruApp) LegacyAmino() *codec.LegacyAmino {
 	return app.legacyAmino
 }
 
-// AppCodec returns Gaia's app codec.
+// AppCodec returns Nibiru's app codec.
 //
 // NOTE: This is solely to be used for testing purposes as it may be desirable
 // for modules to register their own custom testing types.
@@ -631,7 +631,7 @@ func (app *NibiruApp) AppCodec() codec.Codec {
 	return app.appCodec
 }
 
-// InterfaceRegistry returns Gaia's InterfaceRegistry
+// InterfaceRegistry returns Nibiru's InterfaceRegistry
 func (app *NibiruApp) InterfaceRegistry() types.InterfaceRegistry {
 	return app.interfaceRegistry
 }
