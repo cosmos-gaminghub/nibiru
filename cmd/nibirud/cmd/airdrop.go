@@ -85,8 +85,6 @@ Example:
 			snapshot = exportSnapShotFromGenesisFile(clientCtx, firstGenesisFile, denom, snapshotOutput, snapshot)
 			snapshot = exportSnapShotFromGenesisFile(clientCtx, secondGenesisFile, denom, snapshotOutput, snapshot)
 
-			fmt.Printf("acocunt: %d\n", len(snapshot.Accounts))
-
 			// export snapshot json
 			snapshotJSON, err := json.MarshalIndent(snapshot, "", "    ")
 			if err != nil {
@@ -135,8 +133,7 @@ func exportSnapShotFromGenesisFile(clientCtx client.Context, genesisFile string,
 	stakingGenState := stakingtypes.GetGenesisStateFromAppState(clientCtx.Codec, appState)
 	authGenState := authtypes.GetGenesisStateFromAppState(clientCtx.Codec, appState)
 
-	fmt.Printf("acocunt: %d\n", len(snapshot.Accounts))
-	snapshotAccs := snapshot.Accounts
+	snapshotAccs := make(map[string]SnapshotAccount)
 	for _, account := range authGenState.GetAccounts() {
 
 		if account.TypeUrl == "/cosmos.auth.v1beta1.BaseAccount" {
@@ -164,7 +161,6 @@ func exportSnapShotFromGenesisFile(clientCtx client.Context, genesisFile string,
 				}
 			}
 		}
-
 	}
 
 	// Produce the map of address to total atom balance, both staked and unstaked
@@ -232,8 +228,6 @@ func exportSnapShotFromGenesisFile(clientCtx client.Context, genesisFile string,
 
 	denominator := getDenominator(snapshotAccs)
 	totalBalance := sdk.ZeroInt()
-
-	fmt.Printf("acocunt Import: %d\n", len(snapshotAccs))
 	for address, acc := range snapshotAccs {
 		allAtoms := acc.AtomBalance.ToDec()
 
@@ -259,17 +253,26 @@ func exportSnapShotFromGenesisFile(clientCtx client.Context, genesisFile string,
 		acc.GameBalance = acc.AtomOwnershipPercent.MulInt(sdk.NewInt(TotalGameAirdropAmount)).RoundInt()
 
 		totalBalance = totalBalance.Add(acc.GameBalance)
-		snapshotAccs[address] = acc
+		snapshotAccount, ok := snapshot.Accounts[address]
+		if !ok {
+			snapshot.Accounts[address] = acc
+		} else {
+			if snapshotAccount.GameBalance.IsNil() {
+				snapshotAccount.GameBalance = sdk.ZeroInt()
+			}
+			snapshotAccount.GameBalance = snapshotAccount.GameBalance.Add(acc.GameBalance)
+			snapshotAccount.AtomBalance = snapshotAccount.AtomBalance.Add(acc.AtomBalance)
+			snapshotAccount.AtomUnstakedBalance = snapshotAccount.AtomUnstakedBalance.Add(acc.AtomUnstakedBalance)
+			snapshot.Accounts[address] = snapshotAccount
+		}
 	}
+	snapshot.TotalAtomAmount = totalAtomBalance
+	snapshot.TotalGameAirdropAmount = snapshot.TotalGameAirdropAmount.Add(totalBalance)
+	snapshot.NumberAccounts = snapshot.NumberAccounts + uint64(len(snapshot.Accounts))
+
 	fmt.Printf("Complete read genesis file %s \n", genesisFile)
 	fmt.Printf("# accounts: %d\n", len(snapshotAccs))
 	fmt.Printf("atomTotalSupply: %s\n", totalAtomBalance.String())
 	fmt.Printf("gameTotalSupply: %s\n", totalBalance.String())
-	fmt.Printf("gameTotalSupply: %s\n", sdk.NewInt(TotalGameAirdropAmount).String())
-
-	snapshot.TotalAtomAmount = totalAtomBalance
-	snapshot.TotalGameAirdropAmount = snapshot.TotalGameAirdropAmount.Add(totalBalance)
-	snapshot.NumberAccounts = snapshot.NumberAccounts + uint64(len(snapshotAccs))
-	snapshot.Accounts = snapshotAccs
 	return snapshot
 }
