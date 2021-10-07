@@ -101,7 +101,7 @@ import (
 
 const (
 	appName          = "nibiru"
-	Bech32MainPrefix = "nibiru"
+	Bech32MainPrefix = "game"
 	upgradeName      = "Vega"
 )
 
