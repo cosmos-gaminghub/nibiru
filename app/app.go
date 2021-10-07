@@ -539,9 +539,6 @@ func NewNibiruApp(
 		func(ctx sdk.Context, _ upgradetypes.Plan, _ module.VersionMap) (module.VersionMap, error) {
 			app.IBCKeeper.ConnectionKeeper.SetParams(ctx, ibcconnectiontypes.DefaultParams())
 
-			// Set IBC enable false
-			app.TransferKeeper.SetParams(ctx, ibctransfertypes.NewParams(false, false))
-
 			fromVM := make(map[string]uint64)
 			for moduleName := range app.mm.Modules {
 				fromVM[moduleName] = 1
