@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/cosmos/cosmos-sdk v0.44.0
+	github.com/cosmos/go-bip39 v1.0.0 // indirect
 	github.com/cosmos/ibc-go v1.2.0
 	github.com/gravity-devs/liquidity v1.4.0
 	github.com/hashicorp/golang-lru v0.5.5-0.20210104140557-80c98217689d // indirect
