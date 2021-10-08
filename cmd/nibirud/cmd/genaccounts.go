@@ -21,6 +21,7 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
+	ibctransfertypes "github.com/cosmos/ibc-go/modules/apps/transfer/types"
 )
 
 const (
@@ -379,6 +380,23 @@ func ImportGenesisAccountsFromSnapshotCmd(defaultNodeHome string) *cobra.Command
 				return fmt.Errorf("failed to marshal bank genesis state: %w", err)
 			}
 			appState[banktypes.ModuleName] = bankGenStateBz
+
+			byteIBCTransfer, err := appState[ibctransfertypes.ModuleName].MarshalJSON()
+			if err != nil {
+				return fmt.Errorf("Error marshal ibc transfer: %w", err)
+			}
+
+			var ibcGenState ibctransfertypes.GenesisState
+			err = ibctransfertypes.ModuleCdc.UnmarshalJSON(byteIBCTransfer, &ibcGenState)
+			if err != nil {
+				return fmt.Errorf("Error unmarshal ibc transfer: %w", err)
+			}
+			ibcGenState.Params = ibctransfertypes.NewParams(false, false)
+			ibcGenStateBz, err := clientCtx.Codec.MarshalJSON(&ibcGenState)
+			if err != nil {
+				return fmt.Errorf("failed to marshal ibc genesis state: %w", err)
+			}
+			appState[ibctransfertypes.ModuleName] = ibcGenStateBz
 
 			appStateJSON, err := json.Marshal(appState)
 			if err != nil {
