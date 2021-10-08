@@ -165,7 +165,6 @@ func exportSnapShotFromGenesisFile(clientCtx client.Context, genesisFile string,
 
 	// Produce the map of address to total atom balance, both staked and unstaked
 
-	totalAtomBalance := sdk.NewInt(0)
 	for _, account := range bankGenState.Balances {
 
 		acc, ok := snapshotAccs[account.Address]
@@ -174,7 +173,6 @@ func exportSnapShotFromGenesisFile(clientCtx client.Context, genesisFile string,
 			continue
 		}
 		balance := account.Coins.AmountOf(denom)
-		totalAtomBalance = totalAtomBalance.Add(balance)
 
 		acc.AtomBalance = acc.AtomBalance.Add(balance)
 		acc.AtomUnstakedBalance = acc.AtomUnstakedBalance.Add(balance)
@@ -228,6 +226,7 @@ func exportSnapShotFromGenesisFile(clientCtx client.Context, genesisFile string,
 
 	denominator := getDenominator(snapshotAccs)
 	totalBalance := sdk.ZeroInt()
+	totalAtomBalance := sdk.NewInt(0)
 	for address, acc := range snapshotAccs {
 		allAtoms := acc.AtomBalance.ToDec()
 
@@ -256,6 +255,7 @@ func exportSnapShotFromGenesisFile(clientCtx client.Context, genesisFile string,
 		snapshotAccount, ok := snapshot.Accounts[address]
 		if !ok {
 			snapshot.Accounts[address] = acc
+			totalAtomBalance = totalAtomBalance.Add(acc.AtomBalance)
 		} else {
 			if snapshotAccount.GameBalance.IsNil() {
 				snapshotAccount.GameBalance = sdk.ZeroInt()
@@ -264,6 +264,8 @@ func exportSnapShotFromGenesisFile(clientCtx client.Context, genesisFile string,
 			snapshotAccount.AtomBalance = snapshotAccount.AtomBalance.Add(acc.AtomBalance)
 			snapshotAccount.AtomUnstakedBalance = snapshotAccount.AtomUnstakedBalance.Add(acc.AtomUnstakedBalance)
 			snapshot.Accounts[address] = snapshotAccount
+
+			totalAtomBalance = totalAtomBalance.Add(acc.AtomBalance)
 		}
 	}
 	snapshot.TotalAtomAmount = totalAtomBalance
