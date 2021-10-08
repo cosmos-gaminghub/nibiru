@@ -3,75 +3,31 @@ package cmd
 import (
 	"bufio"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
-	"path/filepath"
 
-	"github.com/pkg/errors"
-
+	"github.com/cosmos-gaminghub/nibiru/app"
 	"github.com/spf13/cobra"
-	"github.com/tendermint/tendermint/libs/cli"
-	"github.com/tendermint/tendermint/types"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/client/input"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	"github.com/cosmos/cosmos-sdk/server"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/types/module"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	authvesting "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
-	"github.com/cosmos/go-bip39"
-	ibctransfertypes "github.com/cosmos/ibc-go/modules/apps/transfer/types"
-	cfg "github.com/tendermint/tendermint/config"
-	tmos "github.com/tendermint/tendermint/libs/os"
-	tmrand "github.com/tendermint/tendermint/libs/rand"
 )
 
 const (
 	flagVestingStart = "vesting-start-time"
 	flagVestingEnd   = "vesting-end-time"
 	flagVestingAmt   = "vesting-amount"
-
-	// FlagOverwrite defines a flag to overwrite an existing genesis JSON file.
-	FlagOverwrite = "overwrite"
-
-	// FlagSeed defines a flag to initialize the private validator key from a specific seed.
-	FlagRecover = "recover"
 )
-
-type printInfo struct {
-	Moniker    string          `json:"moniker" yaml:"moniker"`
-	ChainID    string          `json:"chain_id" yaml:"chain_id"`
-	NodeID     string          `json:"node_id" yaml:"node_id"`
-	GenTxsDir  string          `json:"gentxs_dir" yaml:"gentxs_dir"`
-	AppMessage json.RawMessage `json:"app_message" yaml:"app_message"`
-}
-
-func newPrintInfo(moniker, chainID, nodeID, genTxsDir string, appMessage json.RawMessage) printInfo {
-	return printInfo{
-		Moniker:    moniker,
-		ChainID:    chainID,
-		NodeID:     nodeID,
-		GenTxsDir:  genTxsDir,
-		AppMessage: appMessage,
-	}
-}
-
-func displayInfo(info printInfo) error {
-	out, err := json.MarshalIndent(info, "", " ")
-	if err != nil {
-		return err
-	}
-
-	_, err = fmt.Fprintf(os.Stderr, "%s\n", string(sdk.MustSortJSON(out)))
-
-	return err
-}
 
 // AddGenesisAccountCmd returns add-genesis-account cobra Command.
 func AddGenesisAccountCmd(defaultNodeHome string) *cobra.Command {
@@ -235,109 +191,208 @@ contain valid denominations. Accounts may optionally be supplied with vesting pa
 	return cmd
 }
 
-func InitCmd(mbm module.BasicManager, defaultNodeHome string) *cobra.Command {
+func ImportGenesisAccountsFromSnapshotCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "init [moniker]",
-		Short: "Initialize private validator, p2p, genesis, and application configuration files",
-		Long:  `Initialize validators's and node's configuration files.`,
-		Args:  cobra.ExactArgs(1),
+		Use:   "import-genesis-accounts-from-snapshot [input-snapshot-file] [input-games-file]",
+		Short: "Import genesis accounts from fairdrop snapshot.json and an games.json",
+		Long: `Import genesis accounts from fairdrop snapshot.json
+		20% of airdrop amount is liquid in accounts.
+		The remaining is placed in the claims module.
+		Must also pass in an games.json file to airdrop genesis games
+		Example:
+		nibirud import-genesis-accounts-from-snapshot ../snapshot.json ../games.json
+		- Check input genesis:
+			file is at ~/.nibirud/config/genesis.json
+`,
+		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := client.GetClientContextFromCmd(cmd)
-			cdc := clientCtx.Codec
 
+			// aminoCodec := clientCtx.LegacyAmino.Amino
+
+			clientCtx := client.GetClientContextFromCmd(cmd)
 			serverCtx := server.GetServerContextFromCmd(cmd)
+
 			config := serverCtx.Config
 
 			config.SetRoot(clientCtx.HomeDir)
 
-			chainID, _ := cmd.Flags().GetString(flags.FlagChainID)
-			if chainID == "" {
-				chainID = fmt.Sprintf("test-chain-%v", tmrand.Str(6))
+			genFile := config.GenesisFile()
+			appState, genDoc, err := genutiltypes.GenesisStateFromGenFile(genFile)
+			if err != nil {
+				return fmt.Errorf("failed to unmarshal genesis state: %w", err)
 			}
 
-			// Get bip39 mnemonic
-			var mnemonic string
-			recover, _ := cmd.Flags().GetBool(FlagRecover)
-			if recover {
-				inBuf := bufio.NewReader(cmd.InOrStdin())
-				value, err := input.GetString("Enter your bip39 mnemonic", inBuf)
-				if err != nil {
-					return err
-				}
+			authGenState := authtypes.GetGenesisStateFromAppState(clientCtx.Codec, appState)
 
-				mnemonic = value
-				if !bip39.IsMnemonicValid(mnemonic) {
-					return errors.New("invalid mnemonic")
-				}
+			accs, err := authtypes.UnpackAccounts(authGenState.Accounts)
+			if err != nil {
+				return fmt.Errorf("failed to get accounts from any: %w", err)
 			}
 
-			nodeID, _, err := genutil.InitializeNodeValidatorFilesFromMnemonic(config, mnemonic)
+			// Read snapshot file
+			snapshotInput := args[0]
+			snapshotJSON, err := os.Open(snapshotInput)
+			if err != nil {
+				return err
+			}
+			defer snapshotJSON.Close()
+			byteValue, _ := ioutil.ReadAll(snapshotJSON)
+			snapshot := Snapshot{}
+			json.Unmarshal(byteValue, &snapshot)
 			if err != nil {
 				return err
 			}
 
-			config.Moniker = args[0]
-
-			genFile := config.GenesisFile()
-			overwrite, _ := cmd.Flags().GetBool(FlagOverwrite)
-
-			if !overwrite && tmos.FileExists(genFile) {
-				return fmt.Errorf("genesis.json file already exists: %v", genFile)
-			}
-			appState := mbm.DefaultGenesis(cdc)
-
-			byteIBCTransfer, err := appState[ibctransfertypes.ModuleName].MarshalJSON()
+			// Read ions file
+			gameInput := args[1]
+			gameJSON, err := os.Open(gameInput)
 			if err != nil {
-				return errors.Wrap(err, "Error marshal ibc transfer")
+				return err
+			}
+			defer gameJSON.Close()
+			byteValue2, _ := ioutil.ReadAll(gameJSON)
+			var gameAmts map[string]int64
+			json.Unmarshal(byteValue2, &gameAmts)
+			if err != nil {
+				return err
 			}
 
-			var ibcGenState ibctransfertypes.GenesisState
-			err = ibctransfertypes.ModuleCdc.UnmarshalJSON(byteIBCTransfer, &ibcGenState)
-			if err != nil {
-				return errors.Wrap(err, "Error unmarshal ibc transfer")
-			}
-			ibcGenState.Params = ibctransfertypes.NewParams(false, false)
-			ibcGenStateBz, err := clientCtx.Codec.MarshalJSON(&ibcGenState)
-			if err != nil {
-				return fmt.Errorf("failed to marshal ibc genesis state: %w", err)
-			}
-			appState[ibctransfertypes.ModuleName] = ibcGenStateBz
+			// get genesis params
+			genesisParams := MainnetGenesisParams()
+			nonAirdropAccs := make(map[string]sdk.Coins)
 
-			appStateByte, err := json.MarshalIndent(appState, "", " ")
-			if err != nil {
-				return errors.Wrap(err, "Failed to marshall default genesis state")
+			for _, acc := range genesisParams.DistributedAccounts {
+				nonAirdropAccs[acc.Address] = acc.GetCoins()
 			}
 
-			genDoc := &types.GenesisDoc{}
-			if _, err := os.Stat(genFile); err != nil {
-				if !os.IsNotExist(err) {
+			for addr, amt := range gameAmts {
+				// set atom bech32 prefixes
+				bech32Addr, err := app.ConvertBech32(addr)
+				if err != nil {
 					return err
 				}
-			} else {
-				genDoc, err = types.GenesisDocFromFile(genFile)
+
+				address, err := sdk.AccAddressFromBech32(bech32Addr)
 				if err != nil {
-					return errors.Wrap(err, "Failed to read genesis doc from file")
+					return err
+				}
+
+				if val, ok := nonAirdropAccs[address.String()]; ok {
+					nonAirdropAccs[address.String()] = val.Add(sdk.NewCoin("game", sdk.NewInt(amt).MulRaw(1_000_000)))
+				} else {
+					nonAirdropAccs[address.String()] = sdk.NewCoins(sdk.NewCoin("game", sdk.NewInt(amt).MulRaw(1_000_000)))
 				}
 			}
 
-			genDoc.ChainID = chainID
-			genDoc.Validators = nil
-			genDoc.AppState = appStateByte
-			if err = genutil.ExportGenesisFile(genDoc, genFile); err != nil {
-				return errors.Wrap(err, "Failed to export gensis file")
+			// figure out normalizationFactor to normalize snapshot balances to desired airdrop supply
+			normalizationFactor := genesisParams.AirdropSupply.ToDec().QuoInt(snapshot.TotalGameAirdropAmount)
+			fmt.Printf("normalization factor: %s\n", normalizationFactor)
+
+			// for each account in the snapshot
+			bankGenState := banktypes.GetGenesisStateFromAppState(clientCtx.Codec, appState)
+			liquidBalances := bankGenState.Balances
+			supply := bankGenState.Supply
+			fmt.Println(supply.AmountOf("game"))
+			for _, acc := range snapshot.Accounts {
+				// read address from snapshot
+				bech32Addr, err := app.ConvertBech32(acc.AtomAddress)
+				if err != nil {
+					return err
+				}
+
+				address, err := sdk.AccAddressFromBech32(bech32Addr)
+				if err != nil {
+					return err
+				}
+
+				// initial liquid amounts
+				// We consistently round down to the nearest uosmo
+				liquidCoins := sdk.NewCoins(sdk.NewCoin(genesisParams.NativeCoinMetadatas[0].Base, acc.GameBalance))
+
+				if coins, ok := nonAirdropAccs[address.String()]; ok {
+					liquidCoins = liquidCoins.Add(coins...)
+					delete(nonAirdropAccs, address.String())
+				}
+
+				liquidBalances = append(liquidBalances, banktypes.Balance{
+					Address: address.String(),
+					Coins:   liquidCoins,
+				})
+				supply = supply.Add(liquidCoins...)
+
+				// Add the new account to the set of genesis accounts
+				baseAccount := authtypes.NewBaseAccount(address, nil, 0, 0)
+				if err := baseAccount.Validate(); err != nil {
+					return fmt.Errorf("failed to validate new genesis account: %w", err)
+				}
+				accs = append(accs, baseAccount)
+
+			}
+			fmt.Println(supply.AmountOf("game"))
+
+			var total sdk.Coins
+			for _, balance := range liquidBalances {
+				total = total.Add(balance.Coins...)
 			}
 
-			toPrint := newPrintInfo(config.Moniker, chainID, nodeID, "", appStateByte)
+			fmt.Println(total)
 
-			cfg.WriteConfigFile(filepath.Join(config.RootDir, "config", "config.toml"), config)
-			return displayInfo(toPrint)
+			// distribute remaining game to accounts not in fairdrop
+			for addr, coin := range nonAirdropAccs {
+				// read address from snapshot
+				address, err := sdk.AccAddressFromBech32(addr)
+				if err != nil {
+					return err
+				}
+
+				liquidBalances = append(liquidBalances, banktypes.Balance{
+					Address: address.String(),
+					Coins:   coin,
+				})
+				supply = supply.Add(coin...)
+
+				// Add the new account to the set of genesis accounts
+				baseAccount := authtypes.NewBaseAccount(address, nil, 0, 0)
+				if err := baseAccount.Validate(); err != nil {
+					return fmt.Errorf("failed to validate new genesis account: %w", err)
+				}
+				accs = append(accs, baseAccount)
+			}
+			// auth module genesis
+			accs = authtypes.SanitizeGenesisAccounts(accs)
+			genAccs, err := authtypes.PackAccounts(accs)
+			if err != nil {
+				return fmt.Errorf("failed to convert accounts into any's: %w", err)
+			}
+			authGenState.Accounts = genAccs
+			authGenStateBz, err := clientCtx.Codec.MarshalJSON(&authGenState)
+			if err != nil {
+				return fmt.Errorf("failed to marshal auth genesis state: %w", err)
+			}
+			appState[authtypes.ModuleName] = authGenStateBz
+
+			// bank module genesis
+			bankGenState.Balances = banktypes.SanitizeGenesisBalances(liquidBalances)
+			bankGenState.Supply = supply
+			bankGenStateBz, err := clientCtx.Codec.MarshalJSON(bankGenState)
+			if err != nil {
+				return fmt.Errorf("failed to marshal bank genesis state: %w", err)
+			}
+			appState[banktypes.ModuleName] = bankGenStateBz
+
+			appStateJSON, err := json.Marshal(appState)
+			if err != nil {
+				return fmt.Errorf("failed to marshal application genesis state: %w", err)
+			}
+			genDoc.AppState = appStateJSON
+
+			err = genutil.ExportGenesisFile(genDoc, genFile)
+			return err
 		},
 	}
 
-	cmd.Flags().String(cli.HomeFlag, defaultNodeHome, "node's home directory")
-	cmd.Flags().BoolP(FlagOverwrite, "o", false, "overwrite the genesis.json file")
-	cmd.Flags().Bool(FlagRecover, false, "provide seed phrase to recover existing key instead of creating")
-	cmd.Flags().String(flags.FlagChainID, "", "genesis file chain-id, if left blank will be randomly created")
+	cmd.Flags().String(flags.FlagHome, defaultNodeHome, "The application home directory")
+	flags.AddQueryFlagsToCmd(cmd)
 
 	return cmd
 }

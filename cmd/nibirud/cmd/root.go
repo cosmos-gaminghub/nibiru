@@ -82,6 +82,8 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		genutilcli.GenTxCmd(nibiru.ModuleBasics, encodingConfig.TxConfig, banktypes.GenesisBalancesIterator{}, nibiru.DefaultNodeHome),
 		genutilcli.ValidateGenesisCmd(nibiru.ModuleBasics),
 		AddGenesisAccountCmd(nibiru.DefaultNodeHome),
+		ExportAirdropSnapshotCmd(),
+		ImportGenesisAccountsFromSnapshotCmd(nibiru.DefaultNodeHome),
 		tmcli.NewCompletionCmd(rootCmd, true),
 		testnetCmd(nibiru.ModuleBasics, banktypes.GenesisBalancesIterator{}),
 		debug.Cmd(),
@@ -227,7 +229,7 @@ func (ac appCreator) appExport(
 	if height == -1 {
 		loadLatest = true
 	}
-	gaiaApp := nibiru.NewNibiruApp(
+	nibiruApp := nibiru.NewNibiruApp(
 		logger,
 		db,
 		traceStore,
@@ -240,12 +242,12 @@ func (ac appCreator) appExport(
 	)
 
 	if height != -1 {
-		if err := gaiaApp.LoadHeight(height); err != nil {
+		if err := nibiruApp.LoadHeight(height); err != nil {
 			return servertypes.ExportedApp{}, err
 		}
 	}
 
-	return gaiaApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs)
+	return nibiruApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs)
 }
 
 // func overwriteFlagDefaults(c *cobra.Command, defaults map[string]string) {

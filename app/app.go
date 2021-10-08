@@ -18,7 +18,7 @@ import (
 	tmos "github.com/tendermint/tendermint/libs/os"
 	dbm "github.com/tendermint/tm-db"
 
-	gaiaappparams "github.com/cosmos-gaminghub/nibiru/app/params"
+	nibiruappparams "github.com/cosmos-gaminghub/nibiru/app/params"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
@@ -28,6 +28,7 @@ import (
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	store "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/bech32"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth"
@@ -157,7 +158,7 @@ var (
 	_ servertypes.Application = (*NibiruApp)(nil)
 )
 
-// GaiaApp extends an ABCI application, but with most of its parameters exported.
+// NibiruApp extends an ABCI application, but with most of its parameters exported.
 // They are exported for convenience in creating helper functions, as object
 // capabilities aren't needed for testing.
 type NibiruApp struct { // nolint: golint
@@ -212,7 +213,7 @@ func init() {
 	DefaultNodeHome = filepath.Join(userHomeDir, ".nibiru")
 }
 
-// NewGaiaApp returns a reference to an initialized Gaia.
+// NewNibiuApp returns a reference to an initialized Nibiru.
 func NewNibiruApp(
 	logger log.Logger,
 	db dbm.DB, traceStore io.Writer,
@@ -220,7 +221,7 @@ func NewNibiruApp(
 	skipUpgradeHeights map[int64]bool,
 	homePath string,
 	invCheckPeriod uint,
-	encodingConfig gaiaappparams.EncodingConfig,
+	encodingConfig nibiruappparams.EncodingConfig,
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) *NibiruApp {
@@ -614,7 +615,7 @@ func (app *NibiruApp) ModuleAccountAddrs() map[string]bool {
 	return modAccAddrs
 }
 
-// LegacyAmino returns GaiaApp's amino codec.
+// LegacyAmino returns NibiruApp's amino codec.
 //
 // NOTE: This is solely to be used for testing purposes as it may be desirable
 // for modules to register their own custom testing types.
@@ -622,7 +623,7 @@ func (app *NibiruApp) LegacyAmino() *codec.LegacyAmino {
 	return app.legacyAmino
 }
 
-// AppCodec returns Gaia's app codec.
+// AppCodec returns Nibiru's app codec.
 //
 // NOTE: This is solely to be used for testing purposes as it may be desirable
 // for modules to register their own custom testing types.
@@ -630,7 +631,7 @@ func (app *NibiruApp) AppCodec() codec.Codec {
 	return app.appCodec
 }
 
-// InterfaceRegistry returns Gaia's InterfaceRegistry
+// InterfaceRegistry returns Nibiru's InterfaceRegistry
 func (app *NibiruApp) InterfaceRegistry() types.InterfaceRegistry {
 	return app.interfaceRegistry
 }
@@ -743,4 +744,26 @@ func SetBech32AddressPrefixes(config *sdk.Config) {
 	config.SetBech32PrefixForAccount(Bech32MainPrefix, Bech32MainPrefix+sdk.PrefixPublic)
 	config.SetBech32PrefixForValidator(Bech32MainPrefix+sdk.PrefixValidator+sdk.PrefixOperator, Bech32MainPrefix+sdk.PrefixValidator+sdk.PrefixOperator+sdk.PrefixPublic)
 	config.SetBech32PrefixForConsensusNode(Bech32MainPrefix+sdk.PrefixValidator+sdk.PrefixConsensus, Bech32MainPrefix+sdk.PrefixValidator+sdk.PrefixConsensus+sdk.PrefixPublic)
+}
+
+// setCosmosBech32Prefixes set config for cosmos address system
+func SetCosmosBech32Prefixes(config *sdk.Config) {
+	defaultConfig := sdk.NewConfig()
+	config = sdk.GetConfig()
+	config.SetBech32PrefixForAccount(defaultConfig.GetBech32AccountAddrPrefix(), defaultConfig.GetBech32AccountPubPrefix())
+	config.SetBech32PrefixForValidator(defaultConfig.GetBech32ValidatorAddrPrefix(), defaultConfig.GetBech32ValidatorPubPrefix())
+	config.SetBech32PrefixForConsensusNode(defaultConfig.GetBech32ConsensusAddrPrefix(), defaultConfig.GetBech32ConsensusPubPrefix())
+}
+
+func ConvertBech32(address string) (string, error) {
+	_, bz, err := bech32.DecodeAndConvert(address)
+	if err != nil {
+		panic(err)
+	}
+
+	bech32Addr, err := bech32.ConvertAndEncode(Bech32MainPrefix, bz)
+	if err != nil {
+		panic(err)
+	}
+	return bech32Addr, err
 }
