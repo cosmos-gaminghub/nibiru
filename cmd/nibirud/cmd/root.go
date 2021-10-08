@@ -76,7 +76,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 	cfg.Seal()
 
 	rootCmd.AddCommand(
-		InitCmd(nibiru.ModuleBasics, nibiru.DefaultNodeHome),
+		genutilcli.InitCmd(nibiru.ModuleBasics, nibiru.DefaultNodeHome),
 		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, nibiru.DefaultNodeHome),
 		nibiru.MigrateGenesisCmd(),
 		genutilcli.GenTxCmd(nibiru.ModuleBasics, encodingConfig.TxConfig, banktypes.GenesisBalancesIterator{}, nibiru.DefaultNodeHome),
