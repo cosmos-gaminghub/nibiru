@@ -26,12 +26,12 @@ nibirud keys add <your key name>
 
 3. Add tour account to your local genesis file with a given amount and key you just created.
 ```
-nibirud add-genesis-account $(nibirud keys show <your key name> -a) 100000000000game
+nibirud add-genesis-account $(nibirud keys show <your key name> -a) 100000000000ugame
 ```
 
 4. Create the gentx
 ```
-nibirud gentx <your key name> 100000000000game --commission-rate=0.1 --commission-max-rate=1 --commission-max-change-rate=0.1 --pubkey $(nibirud tendermint show-validator) --chain-id=neuron-1
+nibirud gentx <your key name> 100000000000ugame --commission-rate=0.1 --commission-max-rate=1 --commission-max-change-rate=0.1 --pubkey $(nibirud tendermint show-validator) --chain-id=neuron-1
 ```
 
 5. Create Pull Request to [the testnet repo](https://github.com/cosmos-gaminghub/testnets).
