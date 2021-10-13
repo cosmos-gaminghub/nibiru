@@ -3,7 +3,7 @@ module github.com/cosmos-gaminghub/nibiru
 go 1.16
 
 require (
-	github.com/CosmWasm/wasmd v0.19.1-0.20211007121137-62e976a55157
+	github.com/CosmWasm/wasmd v0.20.0
 	github.com/cosmos/cosmos-sdk v0.42.10
 	github.com/gogo/protobuf v1.3.3
 	github.com/gorilla/mux v1.8.0
