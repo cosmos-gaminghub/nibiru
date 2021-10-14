@@ -87,9 +87,11 @@ import (
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmclient "github.com/CosmWasm/wasmd/x/wasm/client"
+	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	nftmodule "github.com/cosmos-gaminghub/nibiru/x/nft"
 	nftmodulekeeper "github.com/cosmos-gaminghub/nibiru/x/nft/keeper"
 	nftmoduletypes "github.com/cosmos-gaminghub/nibiru/x/nft/types"
+	nftmodulewasm "github.com/cosmos-gaminghub/nibiru/x/nft/wasm"
 	"github.com/tendermint/spm-extras/wasmcmd"
 
 	// unnamed import of statik for swagger UI support
@@ -355,15 +357,35 @@ func NewNibiruApp(
 	)
 	nftModule := nftmodule.NewAppModule(appCodec, app.NftKeeper)
 
-	wasmDir := filepath.Join(homePath, "wasm")
+	// custom message encoder
+	customEncoder := wasmkeeper.DefaultEncoders(appCodec, app.TransferKeeper)
+	customEncoder.Custom = nftmodulewasm.DefaultCustomEncoder().Encode
+	wasmMessageHandler := wasmkeeper.NewDefaultMessageHandler(
+		app.Router(),
+		app.IBCKeeper.ChannelKeeper,
+		scopedWasmKeeper,
+		app.BankKeeper,
+		appCodec,
+		app.TransferKeeper,
+		&customEncoder,
+	)
 
+	// custom queier
+	wasmVMQueryHandler := wasmkeeper.DefaultQueryPlugins(
+		app.BankKeeper,
+		app.StakingKeeper,
+		app.DistrKeeper,
+		app.IBCKeeper.ChannelKeeper,
+		app.GRPCQueryRouter(),
+		app.wasmKeeper,
+	)
+	wasmVMQueryHandler.Custom = nftmodulewasm.DefaultCustomQuerier(&app.NftKeeper).Querier()
+
+	wasmDir := filepath.Join(homePath, "wasm")
 	wasmConfig, err := wasm.ReadWasmConfig(appOpts)
 	if err != nil {
 		panic("error while reading wasm config: " + err.Error())
 	}
-
-	// The last arguments can contain custom message handlers, and custom query handlers,
-	// if we want to allow any custom callbacks
 	supportedFeatures := "iterator,staking,stargate"
 	app.wasmKeeper = wasm.NewKeeper(
 		appCodec,
@@ -382,6 +404,8 @@ func NewNibiruApp(
 		wasmDir,
 		wasmConfig,
 		supportedFeatures,
+		wasmkeeper.WithMessageHandler(wasmMessageHandler),
+		wasmkeeper.WithQueryHandler(wasmVMQueryHandler),
 	)
 
 	// The gov proposal types can be individually enabled
