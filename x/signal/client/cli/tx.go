@@ -8,10 +8,10 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/client/tx"
 
 	// "github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos-gaminghub/nibiru/x/signal/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 var (
@@ -41,32 +41,33 @@ func GetTxCmd() *cobra.Command {
 
 func EmitEvent() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "emit [action] [address]",
+		Use:   "emit [action]",
 		Short: "Emit signal event",
 		Long: `Emit signal event
 Example:
-	nibirud tx signal emit "update signal" "game1..."
+	nibirud tx signal emit "update signal" --from eg --chain-id nibirud-2000 --keyring-backend=test
 `,
-		Args: cobra.ExactArgs(2),
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			action := args[0]
-			address := args[1]
+			action := string(args[0])
 
-			key, err := sdk.AccAddressFromBech32(address)
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			e := sdk.NewEvent("signal", sdk.NewAttribute("action", action))
-			e = e.AppendAttributes(sdk.NewAttribute("sender", key.String()))
-
-			em := sdk.NewEventManager()
-			em.EmitEvent(e)
-			return nil
+			msg := types.NewMsgSignal(
+				action,
+				clientCtx.GetFromAddress().String(),
+			)
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 
-	flags.AddQueryFlagsToCmd(cmd)
+	flags.AddTxFlagsToCmd(cmd)
 
 	return cmd
 }
