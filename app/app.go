@@ -19,6 +19,9 @@ import (
 	dbm "github.com/tendermint/tm-db"
 
 	nibiruappparams "github.com/cosmos-gaminghub/nibiru/app/params"
+	signalmodule "github.com/cosmos-gaminghub/nibiru/x/signal"
+	signalmodulekeeper "github.com/cosmos-gaminghub/nibiru/x/signal/keeper"
+	signalmoduletypes "github.com/cosmos-gaminghub/nibiru/x/signal/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
@@ -139,6 +142,8 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
+
+		signalmodule.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -150,6 +155,8 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
+
+		signalmoduletypes.ModuleName: nil,
 	}
 )
 
@@ -196,6 +203,9 @@ type NibiruApp struct { // nolint: golint
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 
+	// signal keeper
+	SignalKeeper signalmodulekeeper.Keeper
+
 	// the module manager
 	mm *module.Manager
 
@@ -241,6 +251,8 @@ func NewNibiruApp(
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey,
 		capabilitytypes.StoreKey, feegrant.StoreKey, authzkeeper.StoreKey,
+		// this line is used by starport scaffolding # stargate/app/storeKey
+		signalmoduletypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -390,6 +402,16 @@ func NewNibiruApp(
 	)
 	transferModule := transfer.NewAppModule(app.TransferKeeper)
 
+	app.SignalKeeper = *signalmodulekeeper.NewKeeper(
+		appCodec,
+		keys[signalmoduletypes.StoreKey],
+		keys[signalmoduletypes.MemStoreKey],
+
+		// app.AccountKeeper,
+		// app.BankKeeper,
+	)
+	signalModule := signalmodule.NewAppModule(appCodec, app.SignalKeeper)
+
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
 	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferModule)
@@ -433,6 +455,9 @@ func NewNibiruApp(
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
+
+		// signal module
+		signalModule,
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -478,6 +503,9 @@ func NewNibiruApp(
 		ibctransfertypes.ModuleName,
 		feegrant.ModuleName,
 		authz.ModuleName,
+
+		// Signal module
+		signalmoduletypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -736,6 +764,8 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(crisistypes.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
+	// this line is used by starport scaffolding # stargate/app/paramSubspace
+	paramsKeeper.Subspace(signalmoduletypes.ModuleName)
 
 	return paramsKeeper
 }
