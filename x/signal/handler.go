@@ -28,5 +28,12 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 }
 
 func handleMsgCreateSignal(ctx sdk.Context, _ keeper.Keeper, msg *types.MsgCreateSignal) (*sdk.Result, error) {
+	ctx.EventManager().EmitEvents(sdk.Events{
+		sdk.NewEvent(
+			types.TypeMsgCreateSignal,
+			sdk.NewAttribute(sdk.AttributeKeyAction, msg.GetAction()),
+			sdk.NewAttribute(sdk.AttributeKeySender, msg.GetSender()),
+		),
+	})
 	return &sdk.Result{Events: ctx.EventManager().ABCIEvents()}, nil
 }
