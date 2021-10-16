@@ -16,14 +16,22 @@ func TestCustomMessageEncoder(t *testing.T) {
 		encoder       = DefaultCustomEncoder()
 		sender        = testutil.CreateTestAddrs(1)[0]
 		msgIssueDenom = types.MsgIssueDenom{
-			DenomId: "denom-id",
+			DenomId: "denomid",
 			Name:    "name",
 			Schema:  "schema",
 			Sender:  sender.String(),
 		}
+
+		_denomMeg = types.DenomMessage{
+			DenomId: "denomid",
+			Name:    "name",
+			Schema:  "schema",
+		}
+		_denomIssueMsg   = types.DenomIssueMessage{IssueDenom: &_denomMeg}
+		nftDenomIssueMsg = types.NftDenomIssueMessage{Nft: &_denomIssueMsg}
 	)
 
-	msgIssueDenomByte, err := msgIssueDenom.Marshal()
+	msgIssueDenomByte, err := json.Marshal(nftDenomIssueMsg)
 	require.NoError(t, err)
 
 	for _, tc := range []struct {

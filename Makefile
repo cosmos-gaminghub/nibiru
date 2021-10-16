@@ -79,3 +79,20 @@ testcli:
 
 protogen:
 	starport generate proto-go
+
+run:
+	nibirud start --pruning nothing --grpc.address :9090 --home ./.chaindata  --log_level warn
+
+init:
+	rm -rf ./.chaindata/*
+	nibirud init gchain --chain-id localnet --home ./.chaindata
+	nibirud keys add alice --keyring-backend test --home ./.chaindata
+	nibirud keys add bob  --keyring-backend test --home ./.chaindata
+	nibirud keys add tom  --keyring-backend test --home ./.chaindata
+	nibirud add-genesis-account alice 400000000ugtn,100000000stake --home ./.chaindata
+	nibirud add-genesis-account bob 200000000ugtn --home ./.chaindata
+	nibirud gentx alice 100000000stake --keyring-backend test --chain-id localnet --home ./.chaindata --commission-rate 0.0 --commission-max-rate 0.1
+	nibirud collect-gentxs --home ./.chaindata
+
+deploy:
+	source $(shell pwd)/.artifacts/deploy.sh

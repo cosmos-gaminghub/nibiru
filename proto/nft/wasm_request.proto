@@ -1,0 +1,19 @@
+syntax = "proto3";
+package cosmosgaminghub.nibiru.nft;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+
+option go_package = "github.com/cosmos-gaminghub/nibiru/x/nft/types";
+
+message NftDenomRequest {
+    DenomRequest nft = 1;
+}
+message DenomRequest {
+    DenomQuery denom = 1;
+}
+message DenomQuery {
+    string denom_id = 1 [ (gogoproto.moretags) = "yaml:\"denom_id\"" ];
+}
+

@@ -23,7 +23,7 @@ func DefaultCustomEncoder() CustomMessageEncoder {
 }
 
 func (e CustomMessageEncoder) Encode(sender sdk.AccAddress, msg json.RawMessage) ([]sdk.Msg, error) {
-	spew.Dump(msg)
+	spew.Dump("Encoder pass!", msg)
 	if msgs, err := e.Nft(sender, msg); err == nil {
 		return msgs, nil
 	} else if !errors.Is(err, types.ErrUnexpectedMsg) {
@@ -34,10 +34,14 @@ func (e CustomMessageEncoder) Encode(sender sdk.AccAddress, msg json.RawMessage)
 }
 
 func EncodeNftMsg(sender sdk.AccAddress, msg json.RawMessage) ([]sdk.Msg, error) {
-	var denom types.MsgIssueDenom
-	if err := denom.Unmarshal(msg); err == nil {
-		denom.Sender = sender.String()
-		return []sdk.Msg{&denom}, nil
+	var wasmIssueMsg types.NftDenomIssueMessage
+	if err := json.Unmarshal(msg, &wasmIssueMsg); err == nil {
+		return []sdk.Msg{&types.MsgIssueDenom{
+			DenomId: wasmIssueMsg.Nft.IssueDenom.DenomId,
+			Name:    wasmIssueMsg.Nft.IssueDenom.Name,
+			Schema:  wasmIssueMsg.Nft.IssueDenom.Schema,
+			Sender:  sender.String(),
+		}}, nil
 	}
 
 	return nil, types.ErrUnexpectedMsg

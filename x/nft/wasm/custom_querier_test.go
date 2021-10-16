@@ -45,16 +45,29 @@ func setupKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
 
 func TestCustomQuerier(t *testing.T) {
 	var (
-		keeper, ctx      = setupKeeper(t)
-		querier          = DefaultCustomQuerier(keeper).Querier()
-		sender           = testutil.CreateTestAddrs(1)[0]
-		msgDenom         = types.NewMsgIssueDenom("denom-id", "name", "schema", sender.String())
-		reqDenomExist    = irismodtypes.QueryDenomRequest{DenomId: msgDenom.GetDenomId()}
-		reqDenomNotExist = irismodtypes.QueryDenomRequest{DenomId: "not-exist"}
+		keeper, ctx = setupKeeper(t)
+		querier     = DefaultCustomQuerier(keeper).Querier()
+		sender      = testutil.CreateTestAddrs(1)[0]
+		msgDenom    = types.NewMsgIssueDenom("denom-id", "name", "schema", sender.String())
+
+		_denomQuery     = types.DenomQuery{DenomId: msgDenom.GetDenomId()}
+		_denomRequest   = types.DenomRequest{Denom: &_denomQuery}
+		nftDenomRequest = types.NftDenomRequest{Nft: &_denomRequest}
+
+		_noneDenomQuery     = types.DenomQuery{DenomId: "not-exist"}
+		_noneDenomRequest   = types.DenomRequest{Denom: &_noneDenomQuery}
+		noneNftDenomRequest = types.NftDenomRequest{Nft: &_noneDenomRequest}
 	)
 
 	err := keeper.IssueDenom(ctx, msgDenom)
 	require.NoError(t, err)
+
+	require.NoError(t, err)
+	reqDenomExistByte, err := json.Marshal(nftDenomRequest)
+	require.NoError(t, err)
+	reqDenomNotExistByte, err := json.Marshal(noneNftDenomRequest)
+	require.NoError(t, err)
+
 	denomByte, err := json.Marshal(irismodtypes.QueryDenomResponse{
 		Denom: &irismodtypes.Denom{
 			Id:      msgDenom.GetDenomId(),
@@ -64,9 +77,7 @@ func TestCustomQuerier(t *testing.T) {
 		},
 	})
 	require.NoError(t, err)
-	reqDenomExistByte, err := reqDenomExist.Marshal()
-	require.NoError(t, err)
-	reqDenomNotExistByte, err := reqDenomNotExist.Marshal()
+	emptyDenomByte, err := json.Marshal(irismodtypes.QueryDenomResponse{})
 	require.NoError(t, err)
 
 	for _, tc := range []struct {
@@ -81,9 +92,9 @@ func TestCustomQuerier(t *testing.T) {
 			expected: denomByte,
 		},
 		{
-			desc:    "denom not exist",
-			request: json.RawMessage(reqDenomNotExistByte),
-			err:     irismodtypes.ErrInvalidDenom,
+			desc:     "denom not exist",
+			request:  json.RawMessage(reqDenomNotExistByte),
+			expected: emptyDenomByte,
 		},
 		{
 			desc:    "custom",
