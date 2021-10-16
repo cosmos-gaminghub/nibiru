@@ -48,24 +48,36 @@ func TestCustomQuerier(t *testing.T) {
 		keeper, ctx = setupKeeper(t)
 		querier     = DefaultCustomQuerier(keeper).Querier()
 		sender      = testutil.CreateTestAddrs(1)[0]
-		msgDenom    = types.NewMsgIssueDenom("denom-id", "name", "schema", sender.String())
+		sender2     = testutil.CreateTestAddrs(2)[1]
+		msgDenom    = types.NewMsgIssueDenom("denom-id1", "name1", "schema1", sender.String())
+		msgDenom2   = types.NewMsgIssueDenom("denom-id2", "name2", "schema2", sender2.String())
+		err         error
 
-		_denomQuery     = types.DenomQuery{DenomId: msgDenom.GetDenomId()}
-		_denomRequest   = types.DenomRequest{Denom: &_denomQuery}
-		nftDenomRequest = types.NftDenomRequest{Nft: &_denomRequest}
+		_denomQuery = types.WasmDenomQuery{DenomId: msgDenom.GetDenomId()}
+		_denomReq   = types.WasmDenomReq{Denom: &_denomQuery}
+		nftDenomReq = types.WasmNftDenomReq{Nft: &_denomReq}
 
-		_noneDenomQuery     = types.DenomQuery{DenomId: "not-exist"}
-		_noneDenomRequest   = types.DenomRequest{Denom: &_noneDenomQuery}
-		noneNftDenomRequest = types.NftDenomRequest{Nft: &_noneDenomRequest}
+		_noneDenomQuery = types.WasmDenomQuery{DenomId: "not-exist"}
+		_noneDenomReq   = types.WasmDenomReq{Denom: &_noneDenomQuery}
+		noneNftDenomReq = types.WasmNftDenomReq{Nft: &_noneDenomReq}
+
+		_denomAllQuery = types.WasmDenomAllQuery{}
+		_denomAllReq   = types.WasmDenomAllReq{DenomAll: &_denomAllQuery}
+		nftDenomAllReq = types.WasmNftDenomAllReq{Nft: &_denomAllReq}
 	)
 
-	err := keeper.IssueDenom(ctx, msgDenom)
+	err = keeper.IssueDenom(ctx, msgDenom)
+	require.NoError(t, err)
+
+	err = keeper.IssueDenom(ctx, msgDenom2)
 	require.NoError(t, err)
 
 	require.NoError(t, err)
-	reqDenomExistByte, err := json.Marshal(nftDenomRequest)
+	reqDenomExistByte, err := json.Marshal(nftDenomReq)
 	require.NoError(t, err)
-	reqDenomNotExistByte, err := json.Marshal(noneNftDenomRequest)
+	reqDenomNotExistByte, err := json.Marshal(noneNftDenomReq)
+	require.NoError(t, err)
+	reqDenomAllByte, err := json.Marshal(nftDenomAllReq)
 	require.NoError(t, err)
 
 	denomByte, err := json.Marshal(irismodtypes.QueryDenomResponse{
@@ -79,6 +91,23 @@ func TestCustomQuerier(t *testing.T) {
 	require.NoError(t, err)
 	emptyDenomByte, err := json.Marshal(irismodtypes.QueryDenomResponse{})
 	require.NoError(t, err)
+	denomAllByte, err := json.Marshal(irismodtypes.QueryDenomsResponse{
+		Denoms: []irismodtypes.Denom{
+			irismodtypes.Denom{
+				Id:      msgDenom.GetDenomId(),
+				Name:    msgDenom.GetName(),
+				Schema:  msgDenom.GetSchema(),
+				Creator: msgDenom.GetSender(),
+			},
+			irismodtypes.Denom{
+				Id:      msgDenom2.GetDenomId(),
+				Name:    msgDenom2.GetName(),
+				Schema:  msgDenom2.GetSchema(),
+				Creator: msgDenom2.GetSender(),
+			},
+		},
+	})
+	require.NoError(t, err)
 
 	for _, tc := range []struct {
 		desc     string
@@ -87,14 +116,19 @@ func TestCustomQuerier(t *testing.T) {
 		err      error
 	}{
 		{
-			desc:     "denom exist",
+			desc:     "get denom when exist",
 			request:  json.RawMessage(reqDenomExistByte),
 			expected: denomByte,
 		},
 		{
-			desc:     "denom not exist",
+			desc:     "get denom when not exist",
 			request:  json.RawMessage(reqDenomNotExistByte),
 			expected: emptyDenomByte,
+		},
+		{
+			desc:     "get denom all",
+			request:  json.RawMessage(reqDenomAllByte),
+			expected: denomAllByte,
 		},
 		{
 			desc:    "custom",

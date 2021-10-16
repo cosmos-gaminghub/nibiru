@@ -9,6 +9,7 @@ import (
 	"github.com/cosmos-gaminghub/nibiru/x/nft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	irismodtypes "github.com/irisnet/irismod/modules/nft/types"
+	// "github.com/davecgh/go-spew/spew"
 )
 
 type CustomQuerier struct {
@@ -37,8 +38,9 @@ func (q CustomQuerier) Querier() wasmkeeper.CustomQuerier {
 
 func NftQuerier(k *nftmodulekeeper.Keeper) wasmkeeper.CustomQuerier {
 	return func(ctx sdk.Context, request json.RawMessage) ([]byte, error) {
-		var denomReq types.NftDenomRequest
-		if err := json.Unmarshal(request, &denomReq); err == nil {
+		// query denom
+		var denomReq types.WasmNftDenomReq
+		if err := json.Unmarshal(request, &denomReq); err == nil && denomReq.Nft.Denom != nil {
 			denom, err := k.IrisKeeper().GetDenom(ctx, denomReq.Nft.Denom.DenomId)
 			if err != nil {
 				// return err when an err other than "no denom exist" happen
@@ -49,6 +51,15 @@ func NftQuerier(k *nftmodulekeeper.Keeper) wasmkeeper.CustomQuerier {
 			}
 			return json.Marshal(irismodtypes.QueryDenomResponse{
 				Denom: &denom,
+			})
+		}
+
+		// query all denom
+		var denomAllReq types.WasmNftDenomAllReq
+		if err := json.Unmarshal(request, &denomAllReq); err == nil && denomAllReq.Nft.DenomAll != nil {
+			denoms := k.IrisKeeper().GetDenoms(ctx)
+			return json.Marshal(irismodtypes.QueryDenomsResponse{
+				Denoms: denoms,
 			})
 		}
 
