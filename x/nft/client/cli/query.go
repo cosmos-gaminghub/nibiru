@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/spf13/cast"
+
 	"github.com/cosmos-gaminghub/nibiru/x/nft/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	iriscli "github.com/irisnet/irismod/modules/nft/client/cli"
@@ -57,10 +59,15 @@ func GetCmdQueryNFT() *cobra.Command {
 			return err
 		}
 
-		queryClient := irismodtypes.NewQueryClient(clientCtx)
-		resp, err := queryClient.NFT(context.Background(), &irismodtypes.QueryNFTRequest{
+		argsId, err := cast.ToUint64E(args[1])
+		if err != nil {
+			return err
+		}
+
+		queryClient := types.NewQueryClient(clientCtx)
+		resp, err := queryClient.NFT(context.Background(), &types.QueryNFTRequest{
 			DenomId: args[0],
-			TokenId: tokenID.ToIris(),
+			Id:      argsId,
 		})
 		if err != nil {
 			return err
