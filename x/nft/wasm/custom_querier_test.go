@@ -49,27 +49,43 @@ func TestCustomQuerier(t *testing.T) {
 		querier     = DefaultCustomQuerier(keeper).Querier()
 		sender      = testutil.CreateTestAddrs(1)[0]
 		sender2     = testutil.CreateTestAddrs(2)[1]
+		recipient   = testutil.CreateTestAddrs(3)[2]
 		msgDenom    = types.NewMsgIssueDenom("denom-id1", "name1", "schema1", sender.String())
 		msgDenom2   = types.NewMsgIssueDenom("denom-id2", "name2", "schema2", sender2.String())
+		tokenid     = uint64(1)
+		msgMint     = types.NewMsgMintNFT(msgDenom.DenomId, "name", "uri", "data", sender.String(), recipient.String())
 		err         error
 
 		_denomQuery = types.WasmDenomQuery{DenomId: msgDenom.GetDenomId()}
 		_denomReq   = types.WasmDenomReq{Denom: &_denomQuery}
-		nftDenomReq = types.WasmNftDenomReq{Nft: &_denomReq}
+		nftDenomReq = types.WasmGameDenomReq{Nft: &_denomReq}
 
 		_noneDenomQuery = types.WasmDenomQuery{DenomId: "not-exist"}
 		_noneDenomReq   = types.WasmDenomReq{Denom: &_noneDenomQuery}
-		noneNftDenomReq = types.WasmNftDenomReq{Nft: &_noneDenomReq}
+		noneNftDenomReq = types.WasmGameDenomReq{Nft: &_noneDenomReq}
 
 		_denomAllQuery = types.WasmDenomAllQuery{}
 		_denomAllReq   = types.WasmDenomAllReq{DenomAll: &_denomAllQuery}
-		nftDenomAllReq = types.WasmNftDenomAllReq{Nft: &_denomAllReq}
+		nftDenomAllReq = types.WasmGameDenomAllReq{Nft: &_denomAllReq}
+
+		_nftRuery = types.WasmNftQuery{DenomId: msgMint.GetDenomId(), Id: tokenid}
+		_nftReq   = types.WasmNftReq{Nft: &_nftRuery}
+		nftReq    = types.WasmGameNftReq{Nft: &_nftReq}
+
+		_noDenomNftRuery = types.WasmNftQuery{DenomId: "not-exist", Id: tokenid}
+		_noDenomNftReq   = types.WasmNftReq{Nft: &_noDenomNftRuery}
+		noDenomNftReq    = types.WasmGameNftReq{Nft: &_noDenomNftReq}
+
+		_noIdNftRuery = types.WasmNftQuery{DenomId: msgMint.GetDenomId(), Id: 100}
+		_noIdNftReq   = types.WasmNftReq{Nft: &_noIdNftRuery}
+		noIdNftReq    = types.WasmGameNftReq{Nft: &_noIdNftReq}
 	)
 
 	err = keeper.IssueDenom(ctx, msgDenom)
 	require.NoError(t, err)
-
 	err = keeper.IssueDenom(ctx, msgDenom2)
+	require.NoError(t, err)
+	tokenid, err = keeper.MintNFT(ctx, msgMint)
 	require.NoError(t, err)
 
 	require.NoError(t, err)
@@ -78,6 +94,12 @@ func TestCustomQuerier(t *testing.T) {
 	reqDenomNotExistByte, err := json.Marshal(noneNftDenomReq)
 	require.NoError(t, err)
 	reqDenomAllByte, err := json.Marshal(nftDenomAllReq)
+	require.NoError(t, err)
+	reqNftByte, err := json.Marshal(nftReq)
+	require.NoError(t, err)
+	reqNoDenomNftByte, err := json.Marshal(noDenomNftReq)
+	require.NoError(t, err)
+	reqNoIdNftByte, err := json.Marshal(noIdNftReq)
 	require.NoError(t, err)
 
 	denomByte, err := json.Marshal(irismodtypes.QueryDenomResponse{
@@ -108,6 +130,18 @@ func TestCustomQuerier(t *testing.T) {
 		},
 	})
 	require.NoError(t, err)
+	nftByte, err := json.Marshal(irismodtypes.QueryNFTResponse{
+		NFT: &irismodtypes.BaseNFT{
+			Id:    types.TokenID(tokenid).ToIris(),
+			Name:  msgMint.GetName(),
+			URI:   msgMint.GetURI(),
+			Data:  msgMint.GetData(),
+			Owner: msgMint.GetRecipient(),
+		},
+	})
+	require.NoError(t, err)
+	emptyNftByte, err := json.Marshal(irismodtypes.QueryNFTResponse{})
+	require.NoError(t, err)
 
 	for _, tc := range []struct {
 		desc     string
@@ -116,19 +150,34 @@ func TestCustomQuerier(t *testing.T) {
 		err      error
 	}{
 		{
-			desc:     "get denom when exist",
+			desc:     "succeed to get denom",
 			request:  json.RawMessage(reqDenomExistByte),
 			expected: denomByte,
 		},
 		{
-			desc:     "get denom when not exist",
+			desc:     "faild to get denom by invalid denomid",
 			request:  json.RawMessage(reqDenomNotExistByte),
 			expected: emptyDenomByte,
 		},
 		{
-			desc:     "get denom all",
+			desc:     "succeed to get denom all",
 			request:  json.RawMessage(reqDenomAllByte),
 			expected: denomAllByte,
+		},
+		{
+			desc:     "succeed to get nft",
+			request:  json.RawMessage(reqNftByte),
+			expected: nftByte,
+		},
+		{
+			desc:     "faild to get nft when invalid denomid",
+			request:  json.RawMessage(reqNoDenomNftByte),
+			expected: emptyNftByte,
+		},
+		{
+			desc:     "faild to get nft when invalid tokneid",
+			request:  json.RawMessage(reqNoIdNftByte),
+			expected: emptyNftByte,
 		},
 		{
 			desc:    "custom",

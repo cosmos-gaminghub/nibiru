@@ -26,22 +26,22 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // get denom
-type WasmNftDenomReq struct {
+type WasmGameDenomReq struct {
 	Nft *WasmDenomReq `protobuf:"bytes,1,opt,name=nft,proto3" json:"nft,omitempty"`
 }
 
-func (m *WasmNftDenomReq) Reset()         { *m = WasmNftDenomReq{} }
-func (m *WasmNftDenomReq) String() string { return proto.CompactTextString(m) }
-func (*WasmNftDenomReq) ProtoMessage()    {}
-func (*WasmNftDenomReq) Descriptor() ([]byte, []int) {
+func (m *WasmGameDenomReq) Reset()         { *m = WasmGameDenomReq{} }
+func (m *WasmGameDenomReq) String() string { return proto.CompactTextString(m) }
+func (*WasmGameDenomReq) ProtoMessage()    {}
+func (*WasmGameDenomReq) Descriptor() ([]byte, []int) {
 	return fileDescriptor_38d37e3479c5d69b, []int{0}
 }
-func (m *WasmNftDenomReq) XXX_Unmarshal(b []byte) error {
+func (m *WasmGameDenomReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *WasmNftDenomReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *WasmGameDenomReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_WasmNftDenomReq.Marshal(b, m, deterministic)
+		return xxx_messageInfo_WasmGameDenomReq.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -51,19 +51,19 @@ func (m *WasmNftDenomReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, err
 		return b[:n], nil
 	}
 }
-func (m *WasmNftDenomReq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_WasmNftDenomReq.Merge(m, src)
+func (m *WasmGameDenomReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_WasmGameDenomReq.Merge(m, src)
 }
-func (m *WasmNftDenomReq) XXX_Size() int {
+func (m *WasmGameDenomReq) XXX_Size() int {
 	return m.Size()
 }
-func (m *WasmNftDenomReq) XXX_DiscardUnknown() {
-	xxx_messageInfo_WasmNftDenomReq.DiscardUnknown(m)
+func (m *WasmGameDenomReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_WasmGameDenomReq.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_WasmNftDenomReq proto.InternalMessageInfo
+var xxx_messageInfo_WasmGameDenomReq proto.InternalMessageInfo
 
-func (m *WasmNftDenomReq) GetNft() *WasmDenomReq {
+func (m *WasmGameDenomReq) GetNft() *WasmDenomReq {
 	if m != nil {
 		return m.Nft
 	}
@@ -159,22 +159,22 @@ func (m *WasmDenomQuery) GetDenomId() string {
 }
 
 // get denom all
-type WasmNftDenomAllReq struct {
+type WasmGameDenomAllReq struct {
 	Nft *WasmDenomAllReq `protobuf:"bytes,1,opt,name=nft,proto3" json:"nft,omitempty"`
 }
 
-func (m *WasmNftDenomAllReq) Reset()         { *m = WasmNftDenomAllReq{} }
-func (m *WasmNftDenomAllReq) String() string { return proto.CompactTextString(m) }
-func (*WasmNftDenomAllReq) ProtoMessage()    {}
-func (*WasmNftDenomAllReq) Descriptor() ([]byte, []int) {
+func (m *WasmGameDenomAllReq) Reset()         { *m = WasmGameDenomAllReq{} }
+func (m *WasmGameDenomAllReq) String() string { return proto.CompactTextString(m) }
+func (*WasmGameDenomAllReq) ProtoMessage()    {}
+func (*WasmGameDenomAllReq) Descriptor() ([]byte, []int) {
 	return fileDescriptor_38d37e3479c5d69b, []int{3}
 }
-func (m *WasmNftDenomAllReq) XXX_Unmarshal(b []byte) error {
+func (m *WasmGameDenomAllReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *WasmNftDenomAllReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *WasmGameDenomAllReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_WasmNftDenomAllReq.Marshal(b, m, deterministic)
+		return xxx_messageInfo_WasmGameDenomAllReq.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -184,19 +184,19 @@ func (m *WasmNftDenomAllReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, 
 		return b[:n], nil
 	}
 }
-func (m *WasmNftDenomAllReq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_WasmNftDenomAllReq.Merge(m, src)
+func (m *WasmGameDenomAllReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_WasmGameDenomAllReq.Merge(m, src)
 }
-func (m *WasmNftDenomAllReq) XXX_Size() int {
+func (m *WasmGameDenomAllReq) XXX_Size() int {
 	return m.Size()
 }
-func (m *WasmNftDenomAllReq) XXX_DiscardUnknown() {
-	xxx_messageInfo_WasmNftDenomAllReq.DiscardUnknown(m)
+func (m *WasmGameDenomAllReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_WasmGameDenomAllReq.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_WasmNftDenomAllReq proto.InternalMessageInfo
+var xxx_messageInfo_WasmGameDenomAllReq proto.InternalMessageInfo
 
-func (m *WasmNftDenomAllReq) GetNft() *WasmDenomAllReq {
+func (m *WasmGameDenomAllReq) GetNft() *WasmDenomAllReq {
 	if m != nil {
 		return m.Nft
 	}
@@ -283,45 +283,194 @@ func (m *WasmDenomAllQuery) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_WasmDenomAllQuery proto.InternalMessageInfo
 
+// get nft
+type WasmGameNftReq struct {
+	Nft *WasmNftReq `protobuf:"bytes,1,opt,name=nft,proto3" json:"nft,omitempty"`
+}
+
+func (m *WasmGameNftReq) Reset()         { *m = WasmGameNftReq{} }
+func (m *WasmGameNftReq) String() string { return proto.CompactTextString(m) }
+func (*WasmGameNftReq) ProtoMessage()    {}
+func (*WasmGameNftReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_38d37e3479c5d69b, []int{6}
+}
+func (m *WasmGameNftReq) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *WasmGameNftReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_WasmGameNftReq.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *WasmGameNftReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_WasmGameNftReq.Merge(m, src)
+}
+func (m *WasmGameNftReq) XXX_Size() int {
+	return m.Size()
+}
+func (m *WasmGameNftReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_WasmGameNftReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_WasmGameNftReq proto.InternalMessageInfo
+
+func (m *WasmGameNftReq) GetNft() *WasmNftReq {
+	if m != nil {
+		return m.Nft
+	}
+	return nil
+}
+
+type WasmNftReq struct {
+	Nft *WasmNftQuery `protobuf:"bytes,1,opt,name=nft,proto3" json:"nft,omitempty"`
+}
+
+func (m *WasmNftReq) Reset()         { *m = WasmNftReq{} }
+func (m *WasmNftReq) String() string { return proto.CompactTextString(m) }
+func (*WasmNftReq) ProtoMessage()    {}
+func (*WasmNftReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_38d37e3479c5d69b, []int{7}
+}
+func (m *WasmNftReq) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *WasmNftReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_WasmNftReq.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *WasmNftReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_WasmNftReq.Merge(m, src)
+}
+func (m *WasmNftReq) XXX_Size() int {
+	return m.Size()
+}
+func (m *WasmNftReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_WasmNftReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_WasmNftReq proto.InternalMessageInfo
+
+func (m *WasmNftReq) GetNft() *WasmNftQuery {
+	if m != nil {
+		return m.Nft
+	}
+	return nil
+}
+
+type WasmNftQuery struct {
+	DenomId string `protobuf:"bytes,1,opt,name=denom_id,json=denomId,proto3" json:"denom_id,omitempty" yaml:"denom_id"`
+	Id      uint64 `protobuf:"varint,2,opt,name=id,proto3" json:"id,omitempty" yaml:"id"`
+}
+
+func (m *WasmNftQuery) Reset()         { *m = WasmNftQuery{} }
+func (m *WasmNftQuery) String() string { return proto.CompactTextString(m) }
+func (*WasmNftQuery) ProtoMessage()    {}
+func (*WasmNftQuery) Descriptor() ([]byte, []int) {
+	return fileDescriptor_38d37e3479c5d69b, []int{8}
+}
+func (m *WasmNftQuery) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *WasmNftQuery) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_WasmNftQuery.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *WasmNftQuery) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_WasmNftQuery.Merge(m, src)
+}
+func (m *WasmNftQuery) XXX_Size() int {
+	return m.Size()
+}
+func (m *WasmNftQuery) XXX_DiscardUnknown() {
+	xxx_messageInfo_WasmNftQuery.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_WasmNftQuery proto.InternalMessageInfo
+
+func (m *WasmNftQuery) GetDenomId() string {
+	if m != nil {
+		return m.DenomId
+	}
+	return ""
+}
+
+func (m *WasmNftQuery) GetId() uint64 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
 func init() {
-	proto.RegisterType((*WasmNftDenomReq)(nil), "cosmosgaminghub.nibiru.nft.WasmNftDenomReq")
+	proto.RegisterType((*WasmGameDenomReq)(nil), "cosmosgaminghub.nibiru.nft.WasmGameDenomReq")
 	proto.RegisterType((*WasmDenomReq)(nil), "cosmosgaminghub.nibiru.nft.WasmDenomReq")
 	proto.RegisterType((*WasmDenomQuery)(nil), "cosmosgaminghub.nibiru.nft.WasmDenomQuery")
-	proto.RegisterType((*WasmNftDenomAllReq)(nil), "cosmosgaminghub.nibiru.nft.WasmNftDenomAllReq")
+	proto.RegisterType((*WasmGameDenomAllReq)(nil), "cosmosgaminghub.nibiru.nft.WasmGameDenomAllReq")
 	proto.RegisterType((*WasmDenomAllReq)(nil), "cosmosgaminghub.nibiru.nft.WasmDenomAllReq")
 	proto.RegisterType((*WasmDenomAllQuery)(nil), "cosmosgaminghub.nibiru.nft.WasmDenomAllQuery")
+	proto.RegisterType((*WasmGameNftReq)(nil), "cosmosgaminghub.nibiru.nft.WasmGameNftReq")
+	proto.RegisterType((*WasmNftReq)(nil), "cosmosgaminghub.nibiru.nft.WasmNftReq")
+	proto.RegisterType((*WasmNftQuery)(nil), "cosmosgaminghub.nibiru.nft.WasmNftQuery")
 }
 
 func init() { proto.RegisterFile("nft/wasm_request.proto", fileDescriptor_38d37e3479c5d69b) }
 
 var fileDescriptor_38d37e3479c5d69b = []byte{
-	// 367 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x92, 0xcf, 0x4a, 0xeb, 0x40,
-	0x18, 0xc5, 0x1b, 0x2e, 0xf7, 0x5e, 0x3b, 0x8a, 0xc5, 0x54, 0x44, 0x8a, 0x44, 0xc9, 0xaa, 0x54,
-	0x9a, 0xa1, 0xba, 0x2b, 0x08, 0x6d, 0x71, 0xa1, 0x82, 0xa2, 0x71, 0x21, 0x08, 0x52, 0x26, 0xed,
-	0x64, 0x1c, 0x98, 0x3f, 0x69, 0x66, 0xa2, 0xf6, 0x2d, 0x7c, 0x2c, 0x97, 0x5d, 0xba, 0x12, 0x69,
-	0xdf, 0xc0, 0x27, 0x90, 0xc9, 0xb4, 0x12, 0x11, 0xa1, 0xbb, 0x8f, 0x9c, 0xef, 0xfc, 0xbe, 0x73,
-	0x92, 0x80, 0x2d, 0x11, 0x6b, 0xf8, 0x88, 0x14, 0xef, 0xa7, 0x78, 0x94, 0x61, 0xa5, 0x83, 0x24,
-	0x95, 0x5a, 0xba, 0xb5, 0x81, 0x54, 0x5c, 0x2a, 0x82, 0x38, 0x15, 0xe4, 0x3e, 0x8b, 0x02, 0x41,
-	0x23, 0x9a, 0x66, 0x81, 0x88, 0x75, 0x6d, 0x93, 0x48, 0x22, 0xf3, 0x35, 0x68, 0x26, 0xeb, 0xa8,
-	0xed, 0x10, 0x29, 0x09, 0xc3, 0x10, 0x25, 0x14, 0x22, 0x21, 0xa4, 0x46, 0x9a, 0x4a, 0xa1, 0xe6,
-	0x6a, 0xc3, 0xf2, 0x60, 0x84, 0x14, 0x86, 0xa3, 0x0c, 0xa7, 0x63, 0xf8, 0xd0, 0x8a, 0xb0, 0x46,
-	0x2d, 0x98, 0x20, 0x42, 0x45, 0xbe, 0x6c, 0x77, 0xfd, 0x73, 0x50, 0xb9, 0x41, 0x8a, 0x5f, 0xc4,
-	0xfa, 0x18, 0x0b, 0xc9, 0x43, 0x3c, 0x72, 0xdb, 0xe0, 0x8f, 0x88, 0xf5, 0xb6, 0xb3, 0xe7, 0xd4,
-	0x57, 0x0f, 0xea, 0xc1, 0xef, 0xe1, 0x02, 0xe3, 0x5c, 0xd8, 0x42, 0x63, 0xf2, 0x2f, 0xc1, 0x5a,
-	0xf1, 0xa1, 0xdb, 0x01, 0x7f, 0x87, 0x66, 0x9e, 0xd3, 0x1a, 0x4b, 0xd1, 0xae, 0x4c, 0xe4, 0xd0,
-	0x1a, 0xfd, 0x0e, 0x58, 0xff, 0x2e, 0xb8, 0x01, 0x58, 0xc9, 0xa5, 0x3e, 0x1d, 0xe6, 0xd8, 0x72,
-	0xaf, 0xfa, 0xf1, 0xb6, 0x5b, 0x19, 0x23, 0xce, 0xda, 0xfe, 0x42, 0xf1, 0xc3, 0xff, 0xf9, 0x78,
-	0x3a, 0xf4, 0xaf, 0x81, 0x5b, 0xac, 0xd8, 0x65, 0xcc, 0x24, 0x3b, 0x2a, 0xb6, 0xdc, 0x5f, 0x2a,
-	0x97, 0x75, 0xda, 0xa2, 0x77, 0xf6, 0xbd, 0x15, 0x89, 0x67, 0xa0, 0x6c, 0xaf, 0x23, 0xc6, 0xe6,
-	0xdc, 0xe6, 0xb2, 0x5c, 0x5b, 0xd9, 0xf6, 0xea, 0x32, 0xe6, 0x57, 0xc1, 0xc6, 0x0f, 0xb9, 0x77,
-	0xf2, 0x32, 0xf5, 0x9c, 0xc9, 0xd4, 0x73, 0xde, 0xa7, 0x9e, 0xf3, 0x3c, 0xf3, 0x4a, 0x93, 0x99,
-	0x57, 0x7a, 0x9d, 0x79, 0xa5, 0xdb, 0x80, 0x50, 0x6d, 0xe8, 0x03, 0xc9, 0xa1, 0xbd, 0xd8, 0xfc,
-	0x3a, 0x09, 0xed, 0x49, 0xf8, 0x04, 0xcd, 0xef, 0xa7, 0xc7, 0x09, 0x56, 0xd1, 0xbf, 0xfc, 0xe3,
-	0x1f, 0x7e, 0x06, 0x00, 0x00, 0xff, 0xff, 0xef, 0x3a, 0x82, 0x72, 0x92, 0x02, 0x00, 0x00,
+	// 437 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x93, 0xdf, 0x6a, 0xd4, 0x40,
+	0x14, 0xc6, 0x37, 0xeb, 0xdf, 0x1d, 0xab, 0xd5, 0xac, 0x48, 0x59, 0x34, 0x2d, 0x73, 0x21, 0x4b,
+	0xa5, 0x19, 0xaa, 0x37, 0x52, 0x10, 0xda, 0x45, 0xb0, 0xf6, 0x62, 0xd1, 0x20, 0x08, 0x82, 0x94,
+	0x49, 0x33, 0x19, 0x07, 0xe6, 0x4f, 0x36, 0x33, 0x51, 0xf7, 0x2d, 0x7c, 0x2c, 0x2f, 0x7b, 0xe9,
+	0x55, 0x91, 0xdd, 0x37, 0xe8, 0x13, 0xc8, 0xe4, 0xa4, 0x9a, 0x55, 0xa4, 0xbb, 0x77, 0xc3, 0x39,
+	0xe7, 0xfb, 0xce, 0xef, 0x9b, 0x49, 0xd0, 0x03, 0x9d, 0x3b, 0xf2, 0x85, 0x5a, 0x75, 0x5c, 0xb2,
+	0x49, 0xc5, 0xac, 0x8b, 0x8b, 0xd2, 0x38, 0x13, 0x0e, 0x4e, 0x8c, 0x55, 0xc6, 0x72, 0xaa, 0x84,
+	0xe6, 0x9f, 0xaa, 0x34, 0xd6, 0x22, 0x15, 0x65, 0x15, 0xeb, 0xdc, 0x0d, 0xee, 0x73, 0xc3, 0x4d,
+	0x3d, 0x46, 0xfc, 0x09, 0x14, 0x83, 0x87, 0xdc, 0x18, 0x2e, 0x19, 0xa1, 0x85, 0x20, 0x54, 0x6b,
+	0xe3, 0xa8, 0x13, 0x46, 0xdb, 0xa6, 0xbb, 0x0d, 0x7e, 0x24, 0xa5, 0x96, 0x91, 0x49, 0xc5, 0xca,
+	0x29, 0xf9, 0xbc, 0x9b, 0x32, 0x47, 0x77, 0x49, 0x41, 0xb9, 0xd0, 0xf5, 0x30, 0xcc, 0xe2, 0x31,
+	0xba, 0xfb, 0x9e, 0x5a, 0xf5, 0x8a, 0x2a, 0xf6, 0x92, 0x69, 0xa3, 0x12, 0x36, 0x09, 0xf7, 0xd0,
+	0x15, 0x9d, 0xbb, 0x8d, 0x60, 0x2b, 0x18, 0xde, 0x7a, 0x3a, 0x8c, 0xff, 0x4f, 0x17, 0x7b, 0xe9,
+	0x85, 0x2c, 0xf1, 0x22, 0xfc, 0x06, 0xad, 0xb5, 0x8b, 0xe1, 0x3e, 0xba, 0x96, 0xf9, 0x73, 0xe3,
+	0xb6, 0xbd, 0x94, 0xdb, 0x5b, 0xcf, 0x9c, 0x80, 0x10, 0xef, 0xa3, 0x3b, 0x8b, 0x8d, 0x30, 0x46,
+	0x37, 0xeb, 0xd6, 0xb1, 0xc8, 0x6a, 0xdb, 0xde, 0xa8, 0x7f, 0x7e, 0xb6, 0xb9, 0x3e, 0xa5, 0x4a,
+	0xee, 0xe1, 0x8b, 0x0e, 0x4e, 0x6e, 0xd4, 0xc7, 0xd7, 0x19, 0x7e, 0x87, 0xfa, 0x0b, 0x19, 0x0f,
+	0xa4, 0xf4, 0x68, 0x2f, 0xda, 0x31, 0x9f, 0x2c, 0x05, 0x06, 0x4a, 0x48, 0xfa, 0x11, 0xad, 0xff,
+	0x55, 0x0f, 0x8f, 0x50, 0x0f, 0xd6, 0x53, 0x29, 0x1b, 0xdf, 0x9d, 0x65, 0x7d, 0x21, 0x33, 0x04,
+	0x3b, 0x90, 0x12, 0xf7, 0xd1, 0xbd, 0x7f, 0xda, 0xf8, 0x08, 0xee, 0xc2, 0x27, 0x19, 0xe7, 0xce,
+	0xaf, 0x7c, 0xde, 0x0e, 0xf1, 0xf8, 0xb2, 0x65, 0x20, 0x02, 0xfe, 0x43, 0x84, 0xfe, 0x94, 0x56,
+	0x7c, 0xf3, 0x71, 0xee, 0x80, 0xb7, 0xb9, 0x89, 0xb5, 0x76, 0x71, 0xd5, 0xf7, 0x09, 0x1f, 0xa1,
+	0xae, 0xc8, 0x36, 0xba, 0x5b, 0xc1, 0xf0, 0xea, 0xe8, 0xf6, 0xf9, 0xd9, 0x66, 0x0f, 0x26, 0xfd,
+	0x4c, 0x57, 0x64, 0xa3, 0xc3, 0xef, 0xb3, 0x28, 0x38, 0x9d, 0x45, 0xc1, 0xcf, 0x59, 0x14, 0x7c,
+	0x9b, 0x47, 0x9d, 0xd3, 0x79, 0xd4, 0xf9, 0x31, 0x8f, 0x3a, 0x1f, 0x62, 0x2e, 0x9c, 0xa7, 0x3b,
+	0x31, 0x8a, 0x00, 0xf1, 0xce, 0x6f, 0x64, 0x02, 0xc8, 0xe4, 0x2b, 0xf1, 0x7f, 0x9d, 0x9b, 0x16,
+	0xcc, 0xa6, 0xd7, 0xeb, 0x6f, 0xfe, 0xd9, 0xaf, 0x00, 0x00, 0x00, 0xff, 0xff, 0x31, 0xce, 0x40,
+	0xd5, 0x89, 0x03, 0x00, 0x00,
 }
 
-func (m *WasmNftDenomReq) Marshal() (dAtA []byte, err error) {
+func (m *WasmGameDenomReq) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -331,12 +480,12 @@ func (m *WasmNftDenomReq) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *WasmNftDenomReq) MarshalTo(dAtA []byte) (int, error) {
+func (m *WasmGameDenomReq) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *WasmNftDenomReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *WasmGameDenomReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -421,7 +570,7 @@ func (m *WasmDenomQuery) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *WasmNftDenomAllReq) Marshal() (dAtA []byte, err error) {
+func (m *WasmGameDenomAllReq) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -431,12 +580,12 @@ func (m *WasmNftDenomAllReq) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *WasmNftDenomAllReq) MarshalTo(dAtA []byte) (int, error) {
+func (m *WasmGameDenomAllReq) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *WasmNftDenomAllReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *WasmGameDenomAllReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -514,6 +663,111 @@ func (m *WasmDenomAllQuery) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *WasmGameNftReq) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *WasmGameNftReq) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *WasmGameNftReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Nft != nil {
+		{
+			size, err := m.Nft.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintWasmRequest(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *WasmNftReq) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *WasmNftReq) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *WasmNftReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Nft != nil {
+		{
+			size, err := m.Nft.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintWasmRequest(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *WasmNftQuery) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *WasmNftQuery) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *WasmNftQuery) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Id != 0 {
+		i = encodeVarintWasmRequest(dAtA, i, uint64(m.Id))
+		i--
+		dAtA[i] = 0x10
+	}
+	if len(m.DenomId) > 0 {
+		i -= len(m.DenomId)
+		copy(dAtA[i:], m.DenomId)
+		i = encodeVarintWasmRequest(dAtA, i, uint64(len(m.DenomId)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintWasmRequest(dAtA []byte, offset int, v uint64) int {
 	offset -= sovWasmRequest(v)
 	base := offset
@@ -525,7 +779,7 @@ func encodeVarintWasmRequest(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *WasmNftDenomReq) Size() (n int) {
+func (m *WasmGameDenomReq) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -564,7 +818,7 @@ func (m *WasmDenomQuery) Size() (n int) {
 	return n
 }
 
-func (m *WasmNftDenomAllReq) Size() (n int) {
+func (m *WasmGameDenomAllReq) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -599,13 +853,55 @@ func (m *WasmDenomAllQuery) Size() (n int) {
 	return n
 }
 
+func (m *WasmGameNftReq) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Nft != nil {
+		l = m.Nft.Size()
+		n += 1 + l + sovWasmRequest(uint64(l))
+	}
+	return n
+}
+
+func (m *WasmNftReq) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Nft != nil {
+		l = m.Nft.Size()
+		n += 1 + l + sovWasmRequest(uint64(l))
+	}
+	return n
+}
+
+func (m *WasmNftQuery) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.DenomId)
+	if l > 0 {
+		n += 1 + l + sovWasmRequest(uint64(l))
+	}
+	if m.Id != 0 {
+		n += 1 + sovWasmRequest(uint64(m.Id))
+	}
+	return n
+}
+
 func sovWasmRequest(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
 func sozWasmRequest(x uint64) (n int) {
 	return sovWasmRequest(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *WasmNftDenomReq) Unmarshal(dAtA []byte) error {
+func (m *WasmGameDenomReq) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -628,10 +924,10 @@ func (m *WasmNftDenomReq) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: WasmNftDenomReq: wiretype end group for non-group")
+			return fmt.Errorf("proto: WasmGameDenomReq: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: WasmNftDenomReq: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: WasmGameDenomReq: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -859,7 +1155,7 @@ func (m *WasmDenomQuery) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *WasmNftDenomAllReq) Unmarshal(dAtA []byte) error {
+func (m *WasmGameDenomAllReq) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -882,10 +1178,10 @@ func (m *WasmNftDenomAllReq) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: WasmNftDenomAllReq: wiretype end group for non-group")
+			return fmt.Errorf("proto: WasmGameDenomAllReq: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: WasmNftDenomAllReq: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: WasmGameDenomAllReq: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1060,6 +1356,279 @@ func (m *WasmDenomAllQuery) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: WasmDenomAllQuery: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipWasmRequest(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthWasmRequest
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *WasmGameNftReq) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowWasmRequest
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: WasmGameNftReq: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: WasmGameNftReq: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Nft", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowWasmRequest
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthWasmRequest
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthWasmRequest
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Nft == nil {
+				m.Nft = &WasmNftReq{}
+			}
+			if err := m.Nft.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipWasmRequest(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthWasmRequest
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *WasmNftReq) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowWasmRequest
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: WasmNftReq: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: WasmNftReq: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Nft", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowWasmRequest
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthWasmRequest
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthWasmRequest
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Nft == nil {
+				m.Nft = &WasmNftQuery{}
+			}
+			if err := m.Nft.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipWasmRequest(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthWasmRequest
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *WasmNftQuery) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowWasmRequest
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: WasmNftQuery: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: WasmNftQuery: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DenomId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowWasmRequest
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthWasmRequest
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthWasmRequest
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.DenomId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			m.Id = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowWasmRequest
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Id |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipWasmRequest(dAtA[iNdEx:])

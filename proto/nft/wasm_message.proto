@@ -7,14 +7,28 @@ import "cosmos/base/query/v1beta1/pagination.proto";
 
 option go_package = "github.com/cosmos-gaminghub/nibiru/x/nft/types";
 
+message GameNftDenomIssueMessage {
+    NftDenomIssueMessage nft = 1;
+}
 message NftDenomIssueMessage {
-    DenomIssueMessage nft = 1;
+    DenomIssueMessage issue_denom = 1;
 }
 message DenomIssueMessage {
-    DenomMessage issue_denom = 1;
-}
-message DenomMessage {
     string denom_id = 1 [ (gogoproto.moretags) = "yaml:\"denom_id\"" ];
     string name     = 2 [ (gogoproto.moretags) = "yaml:\"name\"" ];
     string schema   = 3 [ (gogoproto.moretags) = "yaml:\"schema\"" ];
+}
+
+message GameNftMintMessage {
+    NftMintMessage nft = 1;
+}
+message NftMintMessage {
+    MintMessage mint_nft = 1;
+}
+message MintMessage {
+    string denom_id  = 1 [ (gogoproto.moretags) = "yaml:\"denom_id\"" ];
+    string name      = 2 [ (gogoproto.moretags) = "yaml:\"name\"" ];
+    string uri       = 3 [ (gogoproto.moretags) = "yaml:\"uri\"", (gogoproto.customname) = "URI" ];
+    string data      = 4 [ (gogoproto.moretags) = "yaml:\"data\"" ];
+    string recipient = 5 [ (gogoproto.moretags) = "yaml:\"recipient\"" ];
 }

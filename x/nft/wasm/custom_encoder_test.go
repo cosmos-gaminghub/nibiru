@@ -21,17 +21,36 @@ func TestCustomMessageEncoder(t *testing.T) {
 			Schema:  "schema",
 			Sender:  sender.String(),
 		}
+		msgMintNFT = types.MsgMintNFT{
+			DenomId:   "denomid",
+			Name:      "name",
+			URI:       "uri",
+			Data:      "data",
+			Sender:    sender.String(),
+			Recipient: "recipient",
+		}
 
-		_denomMeg = types.DenomMessage{
+		_denomMeg = types.DenomIssueMessage{
 			DenomId: "denomid",
 			Name:    "name",
 			Schema:  "schema",
 		}
-		_denomIssueMsg   = types.DenomIssueMessage{IssueDenom: &_denomMeg}
-		nftDenomIssueMsg = types.NftDenomIssueMessage{Nft: &_denomIssueMsg}
+		_denomIssueMsg   = types.NftDenomIssueMessage{IssueDenom: &_denomMeg}
+		nftDenomIssueMsg = types.GameNftDenomIssueMessage{Nft: &_denomIssueMsg}
+		_mintMeg         = types.MintMessage{
+			DenomId:   "denomid",
+			Name:      "name",
+			URI:       "uri",
+			Data:      "data",
+			Recipient: "recipient",
+		}
+		_nftMintMsg = types.NftMintMessage{MintNft: &_mintMeg}
+		nftMintMsg  = types.GameNftMintMessage{Nft: &_nftMintMsg}
 	)
 
 	msgIssueDenomByte, err := json.Marshal(nftDenomIssueMsg)
+	require.NoError(t, err)
+	msgMintByte, err := json.Marshal(nftMintMsg)
 	require.NoError(t, err)
 
 	for _, tc := range []struct {
@@ -42,11 +61,19 @@ func TestCustomMessageEncoder(t *testing.T) {
 		err      error
 	}{
 		{
-			desc:   "nft",
+			desc:   "issue denom",
 			sender: sender,
 			msg:    json.RawMessage(msgIssueDenomByte),
 			expected: []sdk.Msg{
 				&msgIssueDenom,
+			},
+		},
+		{
+			desc:   "mint nft",
+			sender: sender,
+			msg:    json.RawMessage(msgMintByte),
+			expected: []sdk.Msg{
+				&msgMintNFT,
 			},
 		},
 		{
