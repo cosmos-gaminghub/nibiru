@@ -1,0 +1,16 @@
+syntax = "proto3";
+package cosmosgaminghub.nibiru.nft;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/cosmos-gaminghub/nibiru/x/nft/types";
+
+message BaseNFT {
+    option (gogoproto.equal) = true;
+
+    string id = 1;
+    string name = 2;
+    string uri = 3 [ (gogoproto.customname) = "URI" ];
+    string data = 4;
+    string owner = 5;
+}

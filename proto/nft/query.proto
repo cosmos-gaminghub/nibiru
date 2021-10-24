@@ -1,15 +1,28 @@
 syntax = "proto3";
 package cosmosgaminghub.nibiru.nft;
 
+import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
+import "nft/nft.proto";
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/cosmos-gaminghub/nibiru/x/nft/types";
 
 // Query defines the gRPC querier service.
 service Query {
+    rpc NFT(QueryNFTRequest) returns (QueryNFTResponse) {
+        option (google.api.http).get = "/cosmos-gaminghub/nibiru/nft/{denom_id}/{id}";
+    }
     // this line is used by starport scaffolding # 2
 }
+message QueryNFTRequest {
+    string denom_id = 1 [ (gogoproto.moretags) = "yaml:\"denom_id\"" ];
+    uint64 id = 2 [ (gogoproto.moretags) = "yaml:\"id\"" ];
+}
 
+// QueryNFTResponse is the response type for the Query/NFT RPC method
+message QueryNFTResponse {
+    BaseNFT nft = 1 [ (gogoproto.customname) = "NFT" ];
+}
 // this line is used by starport scaffolding # 3

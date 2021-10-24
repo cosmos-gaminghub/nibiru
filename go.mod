@@ -4,13 +4,18 @@ go 1.16
 
 require (
 	github.com/CosmWasm/wasmd v0.20.0
+	github.com/CosmWasm/wasmvm v1.0.0-beta
 	github.com/cosmos/cosmos-sdk v0.42.10
+	github.com/davecgh/go-spew v1.1.1
 	github.com/gogo/protobuf v1.3.3
+	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.6.0 // indirect
 	github.com/hashicorp/golang-lru v0.5.5-0.20210104140557-80c98217689d // indirect
 	github.com/irisnet/irismod v1.4.0
 	github.com/kr/text v0.2.0 // indirect
+	github.com/regen-network/cosmos-proto v0.3.1 // indirect
 	github.com/spf13/cast v1.4.1
 	github.com/spf13/cobra v1.1.3
 	github.com/spf13/pflag v1.0.5

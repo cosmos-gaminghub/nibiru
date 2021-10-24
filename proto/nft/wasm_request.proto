@@ -1,0 +1,41 @@
+syntax = "proto3";
+package cosmosgaminghub.nibiru.nft;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+
+option go_package = "github.com/cosmos-gaminghub/nibiru/x/nft/types";
+
+// get denom
+message WasmGameDenomReq {
+    WasmDenomReq nft = 1;
+}
+message WasmDenomReq {
+    WasmDenomQuery denom = 1;
+}
+message WasmDenomQuery {
+    string denom_id = 1 [ (gogoproto.moretags) = "yaml:\"denom_id\"" ];
+}
+
+// get denom all
+message WasmGameDenomAllReq {
+    WasmDenomAllReq nft = 1;
+}
+message WasmDenomAllReq {
+    WasmDenomAllQuery denom_all = 1;
+}
+message WasmDenomAllQuery {}
+
+
+// get nft
+message WasmGameNftReq {
+    WasmNftReq nft = 1;
+}
+message WasmNftReq {
+    WasmNftQuery nft = 1;
+}
+message WasmNftQuery {
+    string denom_id = 1 [ (gogoproto.moretags) = "yaml:\"denom_id\"" ];
+    uint64 id       = 2 [ (gogoproto.moretags) = "yaml:\"id\"" ];
+}
