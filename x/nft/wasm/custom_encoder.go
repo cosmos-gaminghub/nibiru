@@ -56,5 +56,35 @@ func EncodeNftMsg(sender sdk.AccAddress, msg json.RawMessage) ([]sdk.Msg, error)
 		}}, nil
 	}
 
+	var wasmEditMsg types.GameNftEditMessage
+	if err := json.Unmarshal(msg, &wasmEditMsg); err == nil && wasmEditMsg.Nft.EditNft != nil {
+		return []sdk.Msg{&types.MsgEditNFT{
+			DenomId: wasmEditMsg.Nft.EditNft.DenomId,
+			Id:      wasmEditMsg.Nft.EditNft.Id,
+			Name:    wasmEditMsg.Nft.EditNft.Name,
+			Data:    wasmEditMsg.Nft.EditNft.Data,
+			Sender:  sender.String(),
+		}}, nil
+	}
+
+	var wasmTransferMsg types.GameNftTransferMessage
+	if err := json.Unmarshal(msg, &wasmTransferMsg); err == nil && wasmTransferMsg.Nft.TransferNft != nil {
+		return []sdk.Msg{&types.MsgTransferNFT{
+			DenomId:   wasmTransferMsg.Nft.TransferNft.DenomId,
+			Id:        wasmTransferMsg.Nft.TransferNft.Id,
+			Sender:    sender.String(),
+			Recipient: wasmTransferMsg.Nft.TransferNft.Recipient,
+		}}, nil
+	}
+
+	var wasmBurnMsg types.GameNftBurnMessage
+	if err := json.Unmarshal(msg, &wasmBurnMsg); err == nil && wasmBurnMsg.Nft.BurnNft != nil {
+		return []sdk.Msg{&types.MsgBurnNFT{
+			DenomId: wasmBurnMsg.Nft.BurnNft.DenomId,
+			Id:      wasmBurnMsg.Nft.BurnNft.Id,
+			Sender:  sender.String(),
+		}}, nil
+	}
+
 	return nil, types.ErrUnexpectedMsg
 }

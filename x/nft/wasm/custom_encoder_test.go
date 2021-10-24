@@ -29,6 +29,24 @@ func TestCustomMessageEncoder(t *testing.T) {
 			Sender:    sender.String(),
 			Recipient: "recipient",
 		}
+		msgEditNFT = types.MsgEditNFT{
+			DenomId: "denomid",
+			Id:      1,
+			Name:    "name",
+			Data:    "data",
+			Sender:  sender.String(),
+		}
+		msgTransferNFT = types.MsgTransferNFT{
+			DenomId:   "denomid",
+			Id:        1,
+			Recipient: "recipient",
+			Sender:    sender.String(),
+		}
+		msgBurnNFT = types.MsgBurnNFT{
+			DenomId: "denomid",
+			Id:      1,
+			Sender:  sender.String(),
+		}
 
 		_denomMeg = types.DenomIssueMessage{
 			DenomId: "denomid",
@@ -46,11 +64,38 @@ func TestCustomMessageEncoder(t *testing.T) {
 		}
 		_nftMintMsg = types.NftMintMessage{MintNft: &_mintMeg}
 		nftMintMsg  = types.GameNftMintMessage{Nft: &_nftMintMsg}
+		_editMeg    = types.EditMessage{
+			DenomId: "denomid",
+			Id:      1,
+			Name:    "name",
+			Data:    "data",
+		}
+		_nftEditMsg  = types.NftEditMessage{EditNft: &_editMeg}
+		nftEditMsg   = types.GameNftEditMessage{Nft: &_nftEditMsg}
+		_transferMeg = types.TransferMessage{
+			DenomId:   "denomid",
+			Id:        1,
+			Recipient: "recipient",
+		}
+		_nftTransferMsg = types.NftTransferMessage{TransferNft: &_transferMeg}
+		nftTransferMsg  = types.GameNftTransferMessage{Nft: &_nftTransferMsg}
+		_burnMeg        = types.BurnMessage{
+			DenomId: "denomid",
+			Id:      1,
+		}
+		_nftBurnMsg = types.NftBurnMessage{BurnNft: &_burnMeg}
+		nftBurnMsg  = types.GameNftBurnMessage{Nft: &_nftBurnMsg}
 	)
 
 	msgIssueDenomByte, err := json.Marshal(nftDenomIssueMsg)
 	require.NoError(t, err)
 	msgMintByte, err := json.Marshal(nftMintMsg)
+	require.NoError(t, err)
+	msgEditByte, err := json.Marshal(nftEditMsg)
+	require.NoError(t, err)
+	msgTransferByte, err := json.Marshal(nftTransferMsg)
+	require.NoError(t, err)
+	msgBurnByte, err := json.Marshal(nftBurnMsg)
 	require.NoError(t, err)
 
 	for _, tc := range []struct {
@@ -74,6 +119,30 @@ func TestCustomMessageEncoder(t *testing.T) {
 			msg:    json.RawMessage(msgMintByte),
 			expected: []sdk.Msg{
 				&msgMintNFT,
+			},
+		},
+		{
+			desc:   "edit nft",
+			sender: sender,
+			msg:    json.RawMessage(msgEditByte),
+			expected: []sdk.Msg{
+				&msgEditNFT,
+			},
+		},
+		{
+			desc:   "transfer nft",
+			sender: sender,
+			msg:    json.RawMessage(msgTransferByte),
+			expected: []sdk.Msg{
+				&msgTransferNFT,
+			},
+		},
+		{
+			desc:   "burn nft",
+			sender: sender,
+			msg:    json.RawMessage(msgBurnByte),
+			expected: []sdk.Msg{
+				&msgBurnNFT,
 			},
 		},
 		{

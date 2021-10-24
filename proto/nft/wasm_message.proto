@@ -32,3 +32,39 @@ message MintMessage {
     string data      = 4 [ (gogoproto.moretags) = "yaml:\"data\"" ];
     string recipient = 5 [ (gogoproto.moretags) = "yaml:\"recipient\"" ];
 }
+
+message GameNftEditMessage {
+    NftEditMessage nft = 1;
+}
+message NftEditMessage {
+    EditMessage edit_nft = 1;
+}
+message EditMessage {
+    string denom_id = 1 [ (gogoproto.moretags) = "yaml:\"denom_id\"" ];
+    uint64 id       = 2 [ (gogoproto.moretags) = "yaml:\"id\"" ];
+    string name     = 3 [ (gogoproto.moretags) = "yaml:\"name\"" ];
+    string data     = 4 [ (gogoproto.moretags) = "yaml:\"data\"" ];
+}
+
+message GameNftTransferMessage {
+    NftTransferMessage nft = 1;
+}
+message NftTransferMessage {
+    TransferMessage transfer_nft = 1;
+}
+message TransferMessage {
+    string denom_id  = 1 [ (gogoproto.moretags) = "yaml:\"denom_id\"" ];
+    uint64 id        = 2 [ (gogoproto.moretags) = "yaml:\"id\"" ];
+    string recipient = 3 [ (gogoproto.moretags) = "yaml:\"recipient\"" ];
+}
+
+message GameNftBurnMessage {
+    NftBurnMessage nft = 1;
+}
+message NftBurnMessage {
+    BurnMessage burn_nft = 1;
+}
+message BurnMessage {
+    string denom_id = 1 [ (gogoproto.moretags) = "yaml:\"denom_id\"" ];
+    uint64 id       = 2 [ (gogoproto.moretags) = "yaml:\"id\"" ];
+}
