@@ -25,11 +25,11 @@ import (
 	tmos "github.com/tendermint/tendermint/libs/os"
 	dbm "github.com/tendermint/tm-db"
 
+	nibiruappparams "github.com/cosmos-gaminghub/nibiru/app/params"
 	signalmodule "github.com/cosmos-gaminghub/nibiru/x/signal"
 	signalmodulekeeper "github.com/cosmos-gaminghub/nibiru/x/signal/keeper"
 	signalmoduletypes "github.com/cosmos-gaminghub/nibiru/x/signal/types"
 
-	nibiruappparams "github.com/cosmos-gaminghub/nibiru/app/params"
 	store "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/bech32"
@@ -790,6 +790,8 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(crisistypes.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
+	paramsKeeper.Subspace(routertypes.ModuleName).WithKeyTable(routertypes.ParamKeyTable())
+
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 	paramsKeeper.Subspace(signalmoduletypes.ModuleName)
 
