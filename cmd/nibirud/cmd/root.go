@@ -52,7 +52,11 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		Use:   "nibirud",
 		Short: "Nibiru Hub App Daemon (server)",
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
-			initClientCtx = client.ReadHomeFlag(initClientCtx, cmd)
+			err := client.SetCmdClientContext(cmd, initClientCtx)
+			if err != nil {
+				return err
+			}
+			initClientCtx = client.GetClientContextFromCmd(cmd)
 			initClientCtx, err := config.ReadFromClientConfig(initClientCtx)
 			if err != nil {
 				return err
