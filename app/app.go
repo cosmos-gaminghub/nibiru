@@ -96,10 +96,6 @@ import (
 	ibchost "github.com/cosmos/ibc-go/v2/modules/core/24-host"
 	ibckeeper "github.com/cosmos/ibc-go/v2/modules/core/keeper"
 
-	"github.com/strangelove-ventures/packet-forward-middleware/router"
-	routerkeeper "github.com/strangelove-ventures/packet-forward-middleware/router/keeper"
-	routertypes "github.com/strangelove-ventures/packet-forward-middleware/router/types"
-
 	// unnamed import of statik for swagger UI support
 	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
 )
@@ -143,7 +139,6 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
-		router.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -196,7 +191,6 @@ type NibiruApp struct { // nolint: golint
 	TransferKeeper   ibctransferkeeper.Keeper
 	FeeGrantKeeper   feegrantkeeper.Keeper
 	AuthzKeeper      authzkeeper.Keeper
-	RouterKeeper     routerkeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
@@ -246,7 +240,7 @@ func NewNibiruApp(
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey,
-		capabilitytypes.StoreKey, feegrant.StoreKey, authzkeeper.StoreKey, routertypes.StoreKey,
+		capabilitytypes.StoreKey, feegrant.StoreKey, authzkeeper.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -396,9 +390,6 @@ func NewNibiruApp(
 	)
 	transferModule := transfer.NewAppModule(app.TransferKeeper)
 
-	app.RouterKeeper = routerkeeper.NewKeeper(appCodec, keys[routertypes.StoreKey], app.GetSubspace(routertypes.ModuleName), app.TransferKeeper, app.DistrKeeper)
-	routerModule := router.NewAppModule(app.RouterKeeper, transferModule)
-
 	// create evidence keeper with router
 	evidenceKeeper := evidencekeeper.NewKeeper(
 		appCodec,
@@ -437,7 +428,6 @@ func NewNibiruApp(
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
-		routerModule,
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -453,7 +443,6 @@ func NewNibiruApp(
 		evidencetypes.ModuleName,
 		stakingtypes.ModuleName,
 		ibchost.ModuleName,
-		routertypes.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
 		crisistypes.ModuleName,
@@ -484,7 +473,6 @@ func NewNibiruApp(
 		ibctransfertypes.ModuleName,
 		feegrant.ModuleName,
 		authz.ModuleName,
-		routertypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -554,7 +542,6 @@ func NewNibiruApp(
 			// delete new modules from the map, for _new_ modules as to not skip InitGenesis
 			delete(fromVM, authz.ModuleName)
 			delete(fromVM, feegrant.ModuleName)
-			delete(fromVM, routertypes.ModuleName)
 
 			// make fromVM[authtypes.ModuleName] = 2 to skip the first RunMigrations for auth (because from version 2 to migration version 2 will not migrate)
 			fromVM[authtypes.ModuleName] = 2
@@ -579,7 +566,7 @@ func NewNibiruApp(
 
 	if upgradeInfo.Name == upgradeName && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
 		storeUpgrades := store.StoreUpgrades{
-			Added: []string{authz.ModuleName, feegrant.ModuleName, routertypes.ModuleName},
+			Added: []string{authz.ModuleName, feegrant.ModuleName},
 		}
 
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades
@@ -756,7 +743,6 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(crisistypes.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
-	paramsKeeper.Subspace(routertypes.ModuleName).WithKeyTable(routertypes.ParamKeyTable())
 
 	return paramsKeeper
 }
