@@ -6,7 +6,7 @@
   "repository": "https://github.com/cosmos-gaminghub/nibiru",
   "license": "MIT",
   "devDependencies": {
-    "vuepress": "^1.2.0"
+    "vuepress": "^1.9.5"
   },
   "scripts": {
     "dev": "vuepress dev",
