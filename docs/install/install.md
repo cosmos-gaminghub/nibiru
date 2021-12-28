@@ -3,7 +3,7 @@
 ## Install go
 
 :::tip Required
-**Go 1.16.0+** is required for the Cosmos SDK.
+**Go 1.17.0+** is required for the Cosmos SDK.
 :::
 
 Firstly, install `golang` from [the official golang donwload page](https://golang.org/dl/).
