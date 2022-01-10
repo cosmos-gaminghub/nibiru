@@ -108,7 +108,7 @@ import (
 const (
 	appName          = "nibiru"
 	Bech32MainPrefix = "game"
-	upgradeName      = "v0.8"
+	upgradeName      = "v0.8.1"
 )
 
 var (
