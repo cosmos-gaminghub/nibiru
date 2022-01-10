@@ -1,11 +1,11 @@
+name: Upload Release Asset
 on:
   push:
     tags:
     - 'v*'
-name: Upload Release Asset
 jobs:
   build:
-    name: Upload Release Asset
+    name: Release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -24,8 +24,10 @@ jobs:
           draft: false
           prerelease: false
       - name: Set version
+        id: tag_version
         run: |
           VERSION=$(echo ${{ github.ref }} | sed -e "s#refs/tags/##g")
+          echo ::set-output name=version::$VERSION
       - name: Upload Release Asset
         id: upload-release-asset 
         uses: actions/upload-release-asset@v1
@@ -34,5 +36,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: build/nibirud
-          asset_name: nibirud-${{ VERSION }}
+          asset_name: nibirud-${{ steps.tag_version.outputs.version }}
           asset_content_type: application/octet-stream
