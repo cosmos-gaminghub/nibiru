@@ -6,8 +6,6 @@ import (
 	"os"
 	"path/filepath"
 
-	nibiru "github.com/cosmos-gaminghub/nibiru/app"
-	"github.com/cosmos-gaminghub/nibiru/app/params"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/config"
@@ -30,9 +28,10 @@ import (
 	tmcli "github.com/tendermint/tendermint/libs/cli"
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
-)
 
-var ChainID string
+	nibiru "github.com/cosmos-gaminghub/nibiru/app"
+	"github.com/cosmos-gaminghub/nibiru/app/params"
+)
 
 // NewRootCmd creates a new root command for simd. It is called once in the
 // main function.
@@ -78,7 +77,6 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 	rootCmd.AddCommand(
 		genutilcli.InitCmd(nibiru.ModuleBasics, nibiru.DefaultNodeHome),
 		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, nibiru.DefaultNodeHome),
-		nibiru.MigrateGenesisCmd(),
 		genutilcli.GenTxCmd(nibiru.ModuleBasics, encodingConfig.TxConfig, banktypes.GenesisBalancesIterator{}, nibiru.DefaultNodeHome),
 		genutilcli.ValidateGenesisCmd(nibiru.ModuleBasics),
 		AddGenesisAccountCmd(nibiru.DefaultNodeHome),
@@ -157,6 +155,10 @@ func txCommand() *cobra.Command {
 	return cmd
 }
 
+type appCreator struct {
+	encCfg params.EncodingConfig
+}
+
 // newApp is an AppCreator
 func (a appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts servertypes.AppOptions) servertypes.Application {
 	var cache sdk.MultiStorePersistentCache
@@ -206,10 +208,6 @@ func (a appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, a
 	)
 }
 
-type appCreator struct {
-	encCfg params.EncodingConfig
-}
-
 // appExport creates a new simapp (optionally at a given height)
 func (ac appCreator) appExport(
 	logger log.Logger,
@@ -250,19 +248,3 @@ func (ac appCreator) appExport(
 
 	return nibiruApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs)
 }
-
-// func overwriteFlagDefaults(c *cobra.Command, defaults map[string]string) {
-// 	set := func(s *pflag.FlagSet, key, val string) {
-// 		if f := s.Lookup(key); f != nil {
-// 			f.DefValue = val
-// 			f.Value.Set(val)
-// 		}
-// 	}
-// 	for key, val := range defaults {
-// 		set(c.Flags(), key, val)
-// 		set(c.PersistentFlags(), key, val)
-// 	}
-// 	for _, c := range c.Commands() {
-// 		overwriteFlagDefaults(c, defaults)
-// 	}
-// }
