@@ -136,7 +136,10 @@ func RollbackCmd() *cobra.Command {
 			}
 			block := blockStore.LoadBlock(storeBlockHeight)
 			state.LastResultsHash = block.LastResultsHash
-			stateStore.Save(state)
+			err = stateStore.Save(state)
+			if err != nil {
+				return err
+			}
 			return err
 		},
 	}
