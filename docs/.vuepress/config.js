@@ -41,7 +41,6 @@ module.exports = {
                 collapsable: false,
                 children: [
                     ["localnets/localnet", "Localnet"],
-                    ["localnets/4-node", "4-Node"],
                 ]
             },
             {
