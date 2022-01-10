@@ -24,10 +24,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 	"github.com/cosmos/cosmos-sdk/x/genutil/types"
 	staking "github.com/cosmos/cosmos-sdk/x/staking/types"
-	ibcxfertypes "github.com/cosmos/ibc-go/modules/apps/transfer/types"
-	host "github.com/cosmos/ibc-go/modules/core/24-host"
-	"github.com/cosmos/ibc-go/modules/core/exported"
-	ibccoretypes "github.com/cosmos/ibc-go/modules/core/types"
+	ibcxfertypes "github.com/cosmos/ibc-go/v2/modules/apps/transfer/types"
+	host "github.com/cosmos/ibc-go/v2/modules/core/24-host"
+	"github.com/cosmos/ibc-go/v2/modules/core/exported"
+	ibccoretypes "github.com/cosmos/ibc-go/v2/modules/core/types"
 )
 
 const (
