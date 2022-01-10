@@ -108,7 +108,7 @@ import (
 const (
 	appName          = "nibiru"
 	Bech32MainPrefix = "game"
-	upgradeName      = "add-ibc-router"
+	upgradeName      = "v0.8"
 )
 
 var (
