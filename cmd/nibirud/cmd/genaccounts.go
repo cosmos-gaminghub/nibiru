@@ -239,7 +239,7 @@ func ImportGenesisAccountsFromSnapshotCmd(defaultNodeHome string) *cobra.Command
 			defer snapshotJSON.Close()
 			byteValue, _ := ioutil.ReadAll(snapshotJSON)
 			snapshot := Snapshot{}
-			json.Unmarshal(byteValue, &snapshot)
+			err = json.Unmarshal(byteValue, &snapshot)
 			if err != nil {
 				return err
 			}
@@ -253,7 +253,7 @@ func ImportGenesisAccountsFromSnapshotCmd(defaultNodeHome string) *cobra.Command
 			defer gameJSON.Close()
 			byteValue2, _ := ioutil.ReadAll(gameJSON)
 			var gameAmts map[string]int64
-			json.Unmarshal(byteValue2, &gameAmts)
+			err = json.Unmarshal(byteValue2, &gameAmts)
 			if err != nil {
 				return err
 			}
