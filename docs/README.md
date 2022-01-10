@@ -13,22 +13,19 @@ First, follow the instruction about install `Nibiru`.
 
 [Install Nibiru](install/install.md)
 
-Then, there are three ways to get started `Nibiru` as below.
+Then, there are two ways to get started `Nibiru` as below.
 
-1. [**Localnet**](localnets/localnet.md)
+- [**Localnet**](localnets/localnet.md)
 
 Start your Nibiru node in your local computer.
 It will start producing blocks and you can create address and try sending token demo etc.
 
-2. [**Localnet with 4 node**](localnets/4-node.md)
-
-Start Creating 4 Nibiru node in your computer. In this pattern, each node will connect and every block will be produced thorugh the consnsus of the 4 nodes.
-
-3. [**Join Testnet**](testnets/fullnode.md)
+- [**Join Testnet**](testnets/fullnode.md)
 
 Nibiru-2000 is the current testnet of GAME.
 You can check the detail in [GAME Explorer](https://nibiru-2000.game-explorer.io/).
 
+**nibiru-3000 will be open soon**
 
 ## Reference
 - [Twitter](https://twitter.com/_GAME_official)
