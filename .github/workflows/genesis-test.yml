@@ -2,12 +2,12 @@ name: Genesis Start
 on:
   push:
     branches:
-      - master
-      - develop
+      - main
+      - dev
   pull_request:
     branches:
-      - master
-      - develop
+      - main
+      - dev
 jobs:
   verify-signatures:
     runs-on: ubuntu-latest
