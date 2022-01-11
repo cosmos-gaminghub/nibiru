@@ -48,6 +48,7 @@ module.exports = {
                 collapsable: false,
                 children: [
                     ["config/service", "Service"],
+                    ["config/cosmovisor", "Cosmovisor"],
                 ]
             },
         ],
