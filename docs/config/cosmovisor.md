@@ -81,6 +81,72 @@ sudo systemctl restart nibirud
 ```
 
 ## Practice
-Now let's try to use Cosmovisor in your localnet. In this simulation, you will upddate nibirud version from v to v.
+Now let's try to use Cosmovisor in your localnet. In this simulation, you will upddate nibirud version from `v0.9` to `sm-upgrade`.
 
-[TODO]
+Open one terminal windows, and try the commands below.
+
+```sh
+git checkout v0.9 tags/v0.9
+make install
+```
+
+```sh
+NETWORK=upgrade-1
+DAEMON=nibirud
+HOME_DIR=~/.nibiru
+CONFIG=~/.nibiru/config
+TOKEN_DENOM=ugame
+
+rm -rf $HOME_DIR
+
+$DAEMON init $NETWORK --chain-id $NETWORK
+
+$DAEMON config chain-id $NETWORK
+$DAEMON config keyring-backend test
+
+$DAEMON keys add eg --keyring-backend test
+$DAEMON add-genesis-account $($DAEMON keys show eg -a --keyring-backend test) 100000000000000$TOKEN_DENOM
+
+sed -i "s/\"stake\"/\"$TOKEN_DENOM\"/g" $CONFIG/genesis.json
+jq '.app_state.gov.voting_params.voting_period = "60s"' $CONFIG/genesis.json > tmp.json && mv tmp.json $CONFIG/genesis.json
+
+$DAEMON gentx eg 50000000000000$TOKEN_DENOM --commission-max-change-rate=0.1 --commission-max-rate=1 --commission-rate=0.1 --moniker=eg-validator --keyring-backend test --chain-id $NETWORK
+
+$DAEMON collect-gentxs
+
+$DAEMON validate-genesis
+
+```
+
+Now we are ready. Start the localnet using cosmovisor with the command `cosmovisor start`. In this simulation, there is 60 seconds before voting ends.
+
+In another shell, you have to do three things below.
+
+1. submit `softwareUpgrade` proposal
+2. deposit fund
+3. vote for the proposal
+
+```sh
+NETWORK=upgrade-1
+DAEMON=nibirud
+HOME_DIR=~/.nibiru
+CONFIG=~/.nibiru/config
+TOKEN_DENOM=ugame
+
+$DAEMON tx gov submit-proposal software-upgrade sm-upgrade --upgrade-height=25 --upgrade-info='{"binaries":{"linux/amd64":"https://github.com/cosmos-gaminghub/nibiru/releases/download/sm-upgrade/nibirud-sm-upgrade?checksum=sha256:78d44fe51c1c04a7b0ec7b77cd197a324290659548d80d0d8526094512e8e70b"}}' --from=eg --title='sm-upgrade' --description='add signal module' --chain-id=$NETWORK
+
+$DAEMON tx gov deposit 1 10000000ugame --from=eg --chain-id=$NETWORK
+
+$DAEMON tx gov vote 1 yes --from=eg --chain-id=$NETWORK
+```
+
+:::tip
+`--upgrade-info` is used for the auto downloading feature(`DAEMON_ALLOW_DOWNLOAD_BINARIES=true`)of cosmovisor@v0.1.0. 
+
+:::
+:::warning
+In v1.0.0, this auto downloading feature is not available. So try just for test purpose only.
+:::
+:::tip
+you can check the checksum with the command `sha256sum <file name>`.
+:::

@@ -1,7 +1,7 @@
 # Start your own localnet
 
 :::tip Required
-[Install Nibiru](/install/install.md)
+[Install Nibiru](../install/install.md)
 :::
 
 ## Initialize configuration files and genesis file
