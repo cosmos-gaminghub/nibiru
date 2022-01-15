@@ -1,7 +1,7 @@
 # Become A Validator
 
 :::tip Required
-[Run Nibiru Full Node](/testnets/fullnode.md)
+[Run Nibiru Full Node](../testnets/fullnode.md)
 :::
 
 ## Create a Wallet

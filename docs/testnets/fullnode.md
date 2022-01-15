@@ -1,7 +1,8 @@
 # Run Nibiru Full Node
 
 :::tip Required
-[Install Nibiru](/install/install.md)
+[Install Nibiru](../install/install.md)
+
 :::
 
 ## Initialize node
