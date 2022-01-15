@@ -83,11 +83,15 @@ sudo systemctl restart nibirud
 ## Practice
 Now let's try to use Cosmovisor in your localnet. In this simulation, you will upddate nibirud version from `v0.9` to `sm-upgrade`.
 
-Open one terminal windows, and try the commands below.
+
+### Preparation before network launch
 
 ```sh
-git checkout v0.9 tags/v0.9
+git checkout -b v0.9 tags/v0.9
 make install
+
+# build binary will be used for cosmovisor
+make build
 ```
 
 ```sh
@@ -118,6 +122,28 @@ $DAEMON validate-genesis
 
 ```
 
+Cosmovisor settings
+```sh
+export DAEMON_NAME=nibirud
+export DAEMON_HOME=$HOME/.nibiru
+export DAEMON_RESTART_AFTER_UPGRADE=true
+export DAEMON_ALLOW_DOWNLOAD_BINARIES=true
+
+# make sure v0.9 nibirud is in genesis/bin
+mkdir -p $DAEMON_HOME/cosmovisor/genesis/bin
+cp ./build/nibirud $DAEMON_HOME/cosmovisor/genesis/bin
+```
+
+Set target binary to upgrade
+```sh
+git checkout -b sm-upgrade tags/sm-upgrade
+make build
+
+# make sure sm-upgrade nibirud is in upgrades/signal-module-upgrade/bin
+mkdir -p $DAEMON_HOME/cosmovisor/upgrades/signal-module-upgrade/bin
+cp ./build/nibirud $DAEMON_HOME/cosmovisor/upgrades/signal-module-upgrade/bin
+```
+
 Now we are ready. Start the localnet using cosmovisor with the command `cosmovisor start`. In this simulation, there is 60 seconds before voting ends.
 
 In another shell, you have to do three things below.
@@ -145,8 +171,11 @@ $DAEMON tx gov vote 1 yes --from=eg --chain-id=$NETWORK
 
 :::
 :::warning
-In v1.0.0, this auto downloading feature is not available. So try just for test purpose only.
+In v1.0.0, this auto downloading feature is **NOT** available. So try just for test purpose only.
 :::
 :::tip
 you can check the checksum with the command `sha256sum <file name>`.
 :::
+
+
+If everything is ok, you can see no downtime upgrade from `v0.9` to `sm-upgrade`.
