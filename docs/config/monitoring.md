@@ -11,11 +11,11 @@
 
 ### Install Docker
 1. Remove older installations:
-```bash:
+```bash
 $ sudo apt-get remove docker docker-engine docker.io containerd runc
 ```
 2. Update the apt package index and install packages to allow apt to use a repository over HTTPS:
-```bash:
+```bash
  $ sudo apt-get update
  $ sudo apt-get install \
     apt-transport-https \
@@ -25,7 +25,7 @@ $ sudo apt-get remove docker docker-engine docker.io containerd runc
     lsb-release
 ```
 3. Add Docker’s official GPG key:
-```bash:
+```bash
 $ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 ```
 4. Setup the docker stable repository:
