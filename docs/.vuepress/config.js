@@ -49,6 +49,7 @@ module.exports = {
                 children: [
                     ["config/service", "Service"],
                     ["config/cosmovisor", "Cosmovisor"],
+                    ["config/monitoring", "Monitoring"],
                 ]
             },
         ],
