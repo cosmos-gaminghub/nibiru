@@ -34,12 +34,12 @@ If your node is sync fully, then you can run the following command to upgrade yo
 
 :::tip testnet faucet
 You need some $GAME as Gus to send a tx.
-Please ask in [the Discord validator channel](discord.gg/VfvTCP7Rm2) for faucet token with your address starting `nibiru1`.
+Please ask in [the Discord validator channel](https://discord.gg/VfvTCP7Rm2) for faucet token with your address starting `game1`.
 :::
 
 ```sh
 nibirud tx staking create-validator \
-  --amount=1000game \
+  --amount=1000ugame \
   --pubkey=$(nibirud tendermint show-validator) \
   --moniker=<your_validator_name> \
   --chain-id=<chain_id> \
@@ -52,7 +52,7 @@ nibirud tx staking create-validator \
 ```
 
 :::tip Current testnet chain-id
-`chain-id` is `nibiru-2000`
+`chain-id` is `nibiru-3000`
 :::
 :::tip Insufficient Gas
 If you got an error that implys insufficient gas, then you can modify `--gas="auto"` to some appropriate value.
@@ -60,7 +60,7 @@ If you got an error that implys insufficient gas, then you can modify `--gas="au
 
 
 ### Block Explorer
-Check [GAME Explorer](https://nibiru-2000.game-explorer.io/) to see if your node in validator set correctly.
+Check [GAME Explorer](https://nibiru-3000.game-explorer.io/) to see if your node in validator set correctly.
 
 
 ## Edit Validator

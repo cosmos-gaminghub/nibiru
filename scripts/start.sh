@@ -1,10 +1,10 @@
 #!/bin/bash
 
-NETWORK=nibiru-2000
+NETWORK=nibiru-3000
 DAEMON=nibirud
 HOME_DIR=~/.nibiru
 CONFIG=~/.nibiru/config
-TOKEN_DENOM=game
+TOKEN_DENOM=ugame
 
 rm -rf $HOME_DIR
 
