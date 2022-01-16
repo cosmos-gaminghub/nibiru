@@ -9,8 +9,8 @@
 Firstly, install `golang` from [the official golang donwload page](https://golang.org/dl/).
 
 ```sh
-wget https://golang.org/dl/go1.17.linux-amd64.tar.gz
-sudo tar -C /usr/local -xzf [go-file-name]
+wget https://go.dev/dl/go1.17.6.linux-amd64.tar.gz
+sudo tar -C /usr/local -xzf go1.17.6.linux-amd64.tar.gz
 ```
 
 Be sure to set your `$GOPATH`, `$GOBIN`, and `$PATH` environment variables, for example:
@@ -28,8 +28,8 @@ source ~/.bashrc
 Verify that `golang` has been installed successfully.
 
 ```sh
-$ go version
-go version go1.17.1 linux/amd64
+go version
+go version go1.17.6 linux/amd64
 ```
 
 
@@ -38,7 +38,7 @@ With `golang`, you can compile and run `nibiru`.
 
 ```sh
 git clone https://github.com/cosmos-gaminghub/nibiru.git
-cd nibiru && git checkout -b neuron-1
+cd nibiru && git checkout -b 0.9 tags/0.9
 make install
 ```
 

@@ -8,7 +8,7 @@
 ## Initialize node
 
 ```sh
-nibirud init <your_moniker> --chain-id=neuron-1
+nibirud init <your_moniker> --chain-id=nibiru-3000
 ```
 
 After that command, you can confirm that `.nibirud` folder is created in your home directory.
@@ -17,7 +17,7 @@ After that command, you can confirm that `.nibirud` folder is created in your ho
 1. Initialize the nibiru directories and create the local file with the correct chain-id
 
 ```
-nibirud init <moniker> --chain-id=neuron-1
+nibirud init <moniker> --chain-id=nibiru-3000
 ```
 
 2. Create a local key pair in the keybase
@@ -32,7 +32,7 @@ nibirud add-genesis-account $(nibirud keys show <your key name> -a) 100000000000
 
 4. Create the gentx
 ```
-nibirud gentx <your key name> 100000000000ugame --commission-rate=0.1 --commission-max-rate=1 --commission-max-change-rate=0.1 --pubkey $(nibirud tendermint show-validator) --chain-id=neuron-1
+nibirud gentx <your key name> 100000000000ugame --commission-rate=0.1 --commission-max-rate=1 --commission-max-change-rate=0.1 --pubkey $(nibirud tendermint show-validator) --chain-id=nibiru-3000
 ```
 
 5. Create Pull Request to [the testnet repo](https://github.com/cosmos-gaminghub/testnets).
