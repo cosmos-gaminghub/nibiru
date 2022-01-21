@@ -22,10 +22,8 @@ It will start producing blocks and you can create address and try sending token 
 
 - [**Join Testnet**](testnets/fullnode.md)
 
-Nibiru-2000 is the current testnet of GAME.
-You can check the detail in [GAME Explorer](https://nibiru-2000.game-explorer.io/).
-
-**nibiru-3000 will be open soon**
+Nibiru-3000 is the current testnet of GAME.
+You can check the detail in [GAME Explorer](https://nibiru-3000.game-explorer.io/).
 
 ## Reference
 - [Twitter](https://twitter.com/_GAME_official)
