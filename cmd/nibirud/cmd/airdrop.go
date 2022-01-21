@@ -24,6 +24,9 @@ import (
 const (
 	MaxCap                 = 50000000000
 	TotalGameAirdropAmount = 1000000000000 // 0.5% * 200000000
+
+	FlagDenomName = "name"
+	DeFaultDenom  = "ugame"
 )
 
 type Snapshot struct {
@@ -285,22 +288,19 @@ func exportSnapShotFromGenesisFile(clientCtx client.Context, genesisFile string,
 
 func ImportGenesisAccountsFromSnapshotCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "import-genesis-accounts-from-snapshot [input-snapshot-file] [input-games-file]",
+		Use:   "import-genesis-accounts-from-snapshot [input-snapshot-file] [input-games-file] --name=<denom-name>",
 		Short: "Import genesis accounts from fairdrop snapshot.json and an games.json",
 		Long: `Import genesis accounts from fairdrop snapshot.json
 		20% of airdrop amount is liquid in accounts.
 		The remaining is placed in the claims module.
 		Must also pass in an games.json file to airdrop genesis games
 		Example:
-		nibirud import-genesis-accounts-from-snapshot ../snapshot.json ../games.json
+		nibirud import-genesis-accounts-from-snapshot ../snapshot.json ../games.json --name=ugame
 		- Check input genesis:
 			file is at ~/.nibirud/config/genesis.json
 `,
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-
-			// aminoCodec := clientCtx.LegacyAmino.Amino
-
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			serverCtx := server.GetServerContextFromCmd(cmd)
 
@@ -349,6 +349,11 @@ func ImportGenesisAccountsFromSnapshotCmd(defaultNodeHome string) *cobra.Command
 				return err
 			}
 
+			denomName, err := cmd.Flags().GetString(FlagDenomName)
+			if err != nil {
+				denomName = DeFaultDenom
+			}
+
 			// get genesis params
 			genesisParams := MainnetGenesisParams()
 			nonAirdropAccs := make(map[string]sdk.Coins)
@@ -370,9 +375,9 @@ func ImportGenesisAccountsFromSnapshotCmd(defaultNodeHome string) *cobra.Command
 				}
 
 				if val, ok := nonAirdropAccs[address.String()]; ok {
-					nonAirdropAccs[address.String()] = val.Add(sdk.NewCoin("game", sdk.NewInt(amt).MulRaw(1_000_000)))
+					nonAirdropAccs[address.String()] = val.Add(sdk.NewCoin(denomName, sdk.NewInt(amt).MulRaw(1_000_000)))
 				} else {
-					nonAirdropAccs[address.String()] = sdk.NewCoins(sdk.NewCoin("game", sdk.NewInt(amt).MulRaw(1_000_000)))
+					nonAirdropAccs[address.String()] = sdk.NewCoins(sdk.NewCoin(denomName, sdk.NewInt(amt).MulRaw(1_000_000)))
 				}
 			}
 
