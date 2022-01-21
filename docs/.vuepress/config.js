@@ -50,6 +50,7 @@ module.exports = {
                     ["config/service", "Service"],
                     ["config/cosmovisor", "Cosmovisor"],
                     ["config/monitoring", "Monitoring"],
+                    ["config/statesync", "State Sync"],
                 ]
             },
         ],
