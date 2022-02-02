@@ -24,6 +24,8 @@ import (
 const (
 	MaxCap                 = 50000000000
 	TotalGameAirdropAmount = 1000000000000 // 0.5% * 200000000
+
+	DefaultDenom = "ugame"
 )
 
 type Snapshot struct {
@@ -58,15 +60,13 @@ type Account struct {
 // ExportAirdropSnapshotCmd generates a snapshot.json from a provided cosmos-sdk v0.36 genesis export.
 func ExportAirdropSnapshotCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "export-airdrop-snapshot [airdrop-to-denom] [first-input-snapshot-file] [second-input-snapshot-file] [input-games-file]",
-		Short: "Export a quadratic fairdrop snapshot from a provided cosmos-sdk v0.42 genesis export",
-		Long: `Export a quadratic fairdrop snapshot from a provided cosmos-sdk v0.42 genesis export
+		Use:   "export-airdrop-snapshot [airdrop-to-denom] [first-input-snapshot-file] [second-input-snapshot-file] [output-snapshot-json]",
+		Short: "Export an airdrop snapshot from a provided cosmos-sdk v0.42 genesis export",
+		Long: `Export an airdrop snapshot from a provided cosmos-sdk v0.42 genesis export
 Example:
-	nibirud export-airdrop-snapshot uatom ~/.nibiru/config/genesis.json ../snapshot.json --nibiru-supply=100000000000000
-	- Check input genesis:
-		file is at ~/.nibirud/config/genesis.json
+  nibirud export-airdrop-snapshot uatom cosmoshub4-2021-02-18.json cosmoshub4-2021-11-01.json snapshot.json
 	- Snapshot
-		file is at "../snapshot.json"
+		file is at "./snapshot.json"
 `,
 		Args: cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -285,22 +285,16 @@ func exportSnapShotFromGenesisFile(clientCtx client.Context, genesisFile string,
 
 func ImportGenesisAccountsFromSnapshotCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "import-genesis-accounts-from-snapshot [input-snapshot-file] [input-games-file]",
-		Short: "Import genesis accounts from fairdrop snapshot.json and an games.json",
-		Long: `Import genesis accounts from fairdrop snapshot.json
-		20% of airdrop amount is liquid in accounts.
-		The remaining is placed in the claims module.
-		Must also pass in an games.json file to airdrop genesis games
+		Use:   "import-genesis-accounts-from-snapshot [input-snapshot-file] [input-games-file] --name=<denom-name>",
+		Short: "Import genesis accounts from snapshot.json and games.json",
+		Long: `Import genesis accounts from snapshot.json and games.json
 		Example:
-		nibirud import-genesis-accounts-from-snapshot ../snapshot.json ../games.json
+		nibirud import-genesis-accounts-from-snapshot snapshot.json games.json
 		- Check input genesis:
 			file is at ~/.nibirud/config/genesis.json
 `,
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-
-			// aminoCodec := clientCtx.LegacyAmino.Amino
-
 			clientCtx := client.GetClientContextFromCmd(cmd)
 			serverCtx := server.GetServerContextFromCmd(cmd)
 
@@ -370,15 +364,11 @@ func ImportGenesisAccountsFromSnapshotCmd(defaultNodeHome string) *cobra.Command
 				}
 
 				if val, ok := nonAirdropAccs[address.String()]; ok {
-					nonAirdropAccs[address.String()] = val.Add(sdk.NewCoin("game", sdk.NewInt(amt).MulRaw(1_000_000)))
+					nonAirdropAccs[address.String()] = val.Add(sdk.NewCoin(DefaultDenom, sdk.NewInt(amt).MulRaw(1_000_000)))
 				} else {
-					nonAirdropAccs[address.String()] = sdk.NewCoins(sdk.NewCoin("game", sdk.NewInt(amt).MulRaw(1_000_000)))
+					nonAirdropAccs[address.String()] = sdk.NewCoins(sdk.NewCoin(DefaultDenom, sdk.NewInt(amt).MulRaw(1_000_000)))
 				}
 			}
-
-			// figure out normalizationFactor to normalize snapshot balances to desired airdrop supply
-			normalizationFactor := genesisParams.AirdropSupply.ToDec().QuoInt(snapshot.TotalGameAirdropAmount)
-			fmt.Printf("normalization factor: %s\n", normalizationFactor)
 
 			// for each account in the snapshot
 			bankGenState := banktypes.GetGenesisStateFromAppState(clientCtx.Codec, appState)
@@ -397,7 +387,7 @@ func ImportGenesisAccountsFromSnapshotCmd(defaultNodeHome string) *cobra.Command
 				}
 
 				// initial liquid amounts
-				// We consistently round down to the nearest uosmo
+				// We consistently round down to the nearest ugame
 				liquidCoins := sdk.NewCoins(sdk.NewCoin(genesisParams.NativeCoinMetadatas[0].Base, acc.GameBalance))
 
 				if coins, ok := nonAirdropAccs[address.String()]; ok {
