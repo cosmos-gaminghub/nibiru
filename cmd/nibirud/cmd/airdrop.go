@@ -25,8 +25,7 @@ const (
 	MaxCap                 = 50000000000
 	TotalGameAirdropAmount = 1000000000000 // 0.5% * 200000000
 
-	FlagDenomName = "name"
-	DeFaultDenom  = "ugame"
+	DefaultDenom = "ugame"
 )
 
 type Snapshot struct {
@@ -349,11 +348,6 @@ func ImportGenesisAccountsFromSnapshotCmd(defaultNodeHome string) *cobra.Command
 				return err
 			}
 
-			denomName, err := cmd.Flags().GetString(FlagDenomName)
-			if err != nil {
-				denomName = DeFaultDenom
-			}
-
 			// get genesis params
 			genesisParams := MainnetGenesisParams()
 			nonAirdropAccs := make(map[string]sdk.Coins)
@@ -375,9 +369,9 @@ func ImportGenesisAccountsFromSnapshotCmd(defaultNodeHome string) *cobra.Command
 				}
 
 				if val, ok := nonAirdropAccs[address.String()]; ok {
-					nonAirdropAccs[address.String()] = val.Add(sdk.NewCoin(denomName, sdk.NewInt(amt).MulRaw(1_000_000)))
+					nonAirdropAccs[address.String()] = val.Add(sdk.NewCoin(DefaultDenom, sdk.NewInt(amt).MulRaw(1_000_000)))
 				} else {
-					nonAirdropAccs[address.String()] = sdk.NewCoins(sdk.NewCoin(denomName, sdk.NewInt(amt).MulRaw(1_000_000)))
+					nonAirdropAccs[address.String()] = sdk.NewCoins(sdk.NewCoin(DefaultDenom, sdk.NewInt(amt).MulRaw(1_000_000)))
 				}
 			}
 
