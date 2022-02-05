@@ -343,13 +343,7 @@ func ImportGenesisAccountsFromSnapshotCmd(defaultNodeHome string) *cobra.Command
 				return err
 			}
 
-			// get genesis params
-			genesisParams := MainnetGenesisParams()
 			nonAirdropAccs := make(map[string]sdk.Coins)
-
-			for _, acc := range genesisParams.DistributedAccounts {
-				nonAirdropAccs[acc.Address] = acc.GetCoins()
-			}
 
 			for addr, amt := range gameAmts {
 				// set atom bech32 prefixes
@@ -388,7 +382,8 @@ func ImportGenesisAccountsFromSnapshotCmd(defaultNodeHome string) *cobra.Command
 
 				// initial liquid amounts
 				// We consistently round down to the nearest ugame
-				liquidCoins := sdk.NewCoins(sdk.NewCoin(genesisParams.NativeCoinMetadatas[0].Base, acc.GameBalance))
+
+				liquidCoins := sdk.NewCoins(sdk.NewCoin(DefaultDenom, acc.GameBalance))
 
 				if coins, ok := nonAirdropAccs[address.String()]; ok {
 					liquidCoins = liquidCoins.Add(coins...)
