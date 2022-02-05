@@ -343,13 +343,7 @@ func ImportGenesisAccountsFromSnapshotCmd(defaultNodeHome string) *cobra.Command
 				return err
 			}
 
-			// get genesis params
-			genesisParams := MainnetGenesisParams()
 			nonAirdropAccs := make(map[string]sdk.Coins)
-
-			for _, acc := range genesisParams.DistributedAccounts {
-				nonAirdropAccs[acc.Address] = acc.GetCoins()
-			}
 
 			for addr, amt := range gameAmts {
 				// set atom bech32 prefixes
@@ -364,9 +358,9 @@ func ImportGenesisAccountsFromSnapshotCmd(defaultNodeHome string) *cobra.Command
 				}
 
 				if val, ok := nonAirdropAccs[address.String()]; ok {
-					nonAirdropAccs[address.String()] = val.Add(sdk.NewCoin(DefaultDenom, sdk.NewInt(amt).MulRaw(1_000_000)))
+					nonAirdropAccs[address.String()] = val.Add(sdk.NewCoin(DefaultDenom, sdk.NewInt(amt)))
 				} else {
-					nonAirdropAccs[address.String()] = sdk.NewCoins(sdk.NewCoin(DefaultDenom, sdk.NewInt(amt).MulRaw(1_000_000)))
+					nonAirdropAccs[address.String()] = sdk.NewCoins(sdk.NewCoin(DefaultDenom, sdk.NewInt(amt)))
 				}
 			}
 
@@ -388,7 +382,8 @@ func ImportGenesisAccountsFromSnapshotCmd(defaultNodeHome string) *cobra.Command
 
 				// initial liquid amounts
 				// We consistently round down to the nearest ugame
-				liquidCoins := sdk.NewCoins(sdk.NewCoin(genesisParams.NativeCoinMetadatas[0].Base, acc.GameBalance))
+
+				liquidCoins := sdk.NewCoins(sdk.NewCoin(DefaultDenom, acc.GameBalance))
 
 				if coins, ok := nonAirdropAccs[address.String()]; ok {
 					liquidCoins = liquidCoins.Add(coins...)
@@ -463,7 +458,6 @@ func ImportGenesisAccountsFromSnapshotCmd(defaultNodeHome string) *cobra.Command
 			if err != nil {
 				return fmt.Errorf("Error unmarshal ibc transfer: %w", err)
 			}
-			ibcGenState.Params = ibctransfertypes.NewParams(false, false)
 			ibcGenStateBz, err := clientCtx.Codec.MarshalJSON(&ibcGenState)
 			if err != nil {
 				return fmt.Errorf("failed to marshal ibc genesis state: %w", err)
