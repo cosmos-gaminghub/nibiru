@@ -458,7 +458,6 @@ func ImportGenesisAccountsFromSnapshotCmd(defaultNodeHome string) *cobra.Command
 			if err != nil {
 				return fmt.Errorf("Error unmarshal ibc transfer: %w", err)
 			}
-			ibcGenState.Params = ibctransfertypes.NewParams(false, false)
 			ibcGenStateBz, err := clientCtx.Codec.MarshalJSON(&ibcGenState)
 			if err != nil {
 				return fmt.Errorf("failed to marshal ibc genesis state: %w", err)
