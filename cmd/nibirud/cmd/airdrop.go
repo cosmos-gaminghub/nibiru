@@ -358,9 +358,9 @@ func ImportGenesisAccountsFromSnapshotCmd(defaultNodeHome string) *cobra.Command
 				}
 
 				if val, ok := nonAirdropAccs[address.String()]; ok {
-					nonAirdropAccs[address.String()] = val.Add(sdk.NewCoin(DefaultDenom, sdk.NewInt(amt).MulRaw(1_000_000)))
+					nonAirdropAccs[address.String()] = val.Add(sdk.NewCoin(DefaultDenom, sdk.NewInt(amt)))
 				} else {
-					nonAirdropAccs[address.String()] = sdk.NewCoins(sdk.NewCoin(DefaultDenom, sdk.NewInt(amt).MulRaw(1_000_000)))
+					nonAirdropAccs[address.String()] = sdk.NewCoins(sdk.NewCoin(DefaultDenom, sdk.NewInt(amt)))
 				}
 			}
 
