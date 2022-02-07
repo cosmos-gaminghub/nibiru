@@ -522,6 +522,7 @@ func NewNibiruApp(
 				SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
 			},
 			IBCChannelkeeper: app.IBCKeeper.ChannelKeeper,
+			Cdc:              appCodec,
 		},
 	)
 	if err != nil {
