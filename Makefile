@@ -71,3 +71,22 @@ lint:
 
 build:
 	go build $(BUILD_FLAGS) -o build/nibirud ./cmd/nibirud
+
+###################################################################
+###                          E2E Tests                          ###
+###################################################################
+PACKAGES_E2E=$(shell go list ./... | grep '/e2e')
+
+# build a node container
+.PHONY: docker-build-debug
+docker-build-debug:
+	@docker build -t cosmos/nibirud-e2e --build-arg IMG_TAG=debug -f e2e.Dockerfile .
+
+# build a relayer container
+.PHONY: docker-build-hermes
+docker-build-hermes:
+	@cd tests/e2e/docker; docker build -t cosmos/hermes-e2e:latest -f hermes.Dockerfile .
+
+.PHONY: test-e2e
+test-e2e:
+	@go test -mod=readonly -timeout=25m -v $(PACKAGES_E2E)
