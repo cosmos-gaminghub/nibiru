@@ -43,10 +43,6 @@ func init() {
 
 	config := sdk.GetConfig()
 	nibiru.SetBech32AddressPrefixes(config)
-	// bech32MainPrefix := "cosmos"
-	// config.SetBech32PrefixForAccount(bech32MainPrefix, bech32MainPrefix+sdk.PrefixPublic)
-	// config.SetBech32PrefixForValidator(bech32MainPrefix+sdk.PrefixValidator+sdk.PrefixOperator, bech32MainPrefix+sdk.Bech32MainPrefix+sdk.PrefixOperator+sdk.PrefixPublic)
-	// config.SetBech32PrefixForConsensusNode(bech32MainPrefix+sdk.PrefixValidator+sdk.PrefixConsensus, bech32MainPrefix+sdk.PrefixValidator+sdk.PrefixConsensus+sdk.PrefixPublic)
 	config.Seal()
 }
 
