@@ -97,7 +97,7 @@ func (s *IntegrationTestSuite) SetupSuite() {
 }
 
 func (s *IntegrationTestSuite) TearDownSuite() {
-	if str := os.Getenv("GAIA_E2E_SKIP_CLEANUP"); len(str) > 0 {
+	if str := os.Getenv("NIBIRU_E2E_SKIP_CLEANUP"); len(str) > 0 {
 		skipCleanup, err := strconv.ParseBool(str)
 		s.Require().NoError(err)
 
@@ -356,12 +356,12 @@ func (s *IntegrationTestSuite) runIBCRelayer() {
 				"3031/tcp": {{HostIP: "", HostPort: "3031"}},
 			},
 			Env: []string{
-				fmt.Sprintf("GAIA_A_E2E_CHAIN_ID=%s", s.chainA.id),
-				fmt.Sprintf("GAIA_B_E2E_CHAIN_ID=%s", s.chainB.id),
-				fmt.Sprintf("GAIA_A_E2E_VAL_MNEMONIC=%s", nibiruAVal.mnemonic),
-				fmt.Sprintf("GAIA_B_E2E_VAL_MNEMONIC=%s", nibiruBVal.mnemonic),
-				fmt.Sprintf("GAIA_A_E2E_VAL_HOST=%s", s.valResources[s.chainA.id][0].Container.Name[1:]),
-				fmt.Sprintf("GAIA_B_E2E_VAL_HOST=%s", s.valResources[s.chainB.id][0].Container.Name[1:]),
+				fmt.Sprintf("NIBIRU_A_E2E_CHAIN_ID=%s", s.chainA.id),
+				fmt.Sprintf("NIBIRU_B_E2E_CHAIN_ID=%s", s.chainB.id),
+				fmt.Sprintf("NIBIRU_A_E2E_VAL_MNEMONIC=%s", nibiruAVal.mnemonic),
+				fmt.Sprintf("NIBIRU_B_E2E_VAL_MNEMONIC=%s", nibiruBVal.mnemonic),
+				fmt.Sprintf("NIBIRU_A_E2E_VAL_HOST=%s", s.valResources[s.chainA.id][0].Container.Name[1:]),
+				fmt.Sprintf("NIBIRU_B_E2E_VAL_HOST=%s", s.valResources[s.chainB.id][0].Container.Name[1:]),
 			},
 			Entrypoint: []string{
 				"sh",
