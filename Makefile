@@ -7,7 +7,7 @@ export GO111MODULE = on
 
 # process build tags
 
-LEDGER_ENABLED ?= false
+LEDGER_ENABLED ?= true
 build_tags = netgo
 ifeq ($(LEDGER_ENABLED),true)
   ifeq ($(OS),Windows_NT)
