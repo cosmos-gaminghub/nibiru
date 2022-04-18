@@ -48,6 +48,9 @@ ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=nibiru \
 		  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
 		  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)"
 
+ifeq ($(LINK_STATICALLY),true)
+  ldflags += -linkmode=external -extldflags "-Wl,-z,muldefs -static"
+endif
 ldflags += $(LDFLAGS)
 ldflags := $(strip $(ldflags))
 

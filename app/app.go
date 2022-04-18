@@ -101,6 +101,9 @@ import (
 	ibckeeper "github.com/cosmos/ibc-go/v2/modules/core/keeper"
 
 	nibiruappparams "github.com/cosmos-gaminghub/nibiru/app/params"
+	"github.com/strangelove-ventures/packet-forward-middleware/router"
+	routerkeeper "github.com/strangelove-ventures/packet-forward-middleware/router/keeper"
+	routertypes "github.com/strangelove-ventures/packet-forward-middleware/router/types"
 
 	// unnamed import of statik for swagger UI support
 	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
@@ -167,6 +170,7 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
+		router.AppModuleBasic{},
 		wasm.AppModuleBasic{},
 	)
 
@@ -222,6 +226,7 @@ type NibiruApp struct { // nolint: golint
 	TransferKeeper ibctransferkeeper.Keeper
 	FeeGrantKeeper feegrantkeeper.Keeper
 	AuthzKeeper    authzkeeper.Keeper
+	RouterKeeper routerkeeper.Keeper
 	wasmKeeper     wasm.Keeper
 
 	// make scoped keepers public for test purposes
@@ -275,7 +280,8 @@ func NewNibiruApp(
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
-		feegrant.StoreKey, authzkeeper.StoreKey, wasm.StoreKey,
+		feegrant.StoreKey, authzkeeper.StoreKey, routertypes.StoreKey,
+		wasm.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -426,9 +432,13 @@ func NewNibiruApp(
 	)
 	transferModule := transfer.NewAppModule(app.TransferKeeper)
 
+	app.RouterKeeper = routerkeeper.NewKeeper(appCodec, keys[routertypes.StoreKey], app.GetSubspace(routertypes.ModuleName), app.TransferKeeper, app.DistrKeeper)
+
+	routerModule := router.NewAppModule(app.RouterKeeper, transferModule)
 
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
+	ibcRouter.AddRoute(ibctransfertypes.ModuleName, routerModule)
 	ibcRouter.AddRoute(wasm.ModuleName, wasm.NewIBCHandler(app.wasmKeeper, app.IBCKeeper.ChannelKeeper))
 	app.IBCKeeper.SetRouter(ibcRouter)
 
@@ -505,6 +515,7 @@ func NewNibiruApp(
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
+		routerModule,
 		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.StakingKeeper),
 	)
 
@@ -522,6 +533,7 @@ func NewNibiruApp(
 		stakingtypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		ibchost.ModuleName,
+		routertypes.ModuleName,
 		authtypes.ModuleName,
 		banktypes.ModuleName,
 		distrtypes.ModuleName,
@@ -541,6 +553,7 @@ func NewNibiruApp(
 		stakingtypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		ibchost.ModuleName,
+		routertypes.ModuleName,
 		feegrant.ModuleName,
 		authz.ModuleName,
 		capabilitytypes.ModuleName,
@@ -580,6 +593,7 @@ func NewNibiruApp(
 		authtypes.ModuleName,
 		genutiltypes.ModuleName,
 		paramstypes.ModuleName,
+		routertypes.ModuleName,
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
 		wasm.ModuleName,
@@ -827,6 +841,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(crisistypes.ModuleName)
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
+	paramsKeeper.Subspace(routertypes.ModuleName).WithKeyTable(routertypes.ParamKeyTable())
 	paramsKeeper.Subspace(wasm.ModuleName)
 
 	return paramsKeeper
