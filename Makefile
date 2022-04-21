@@ -7,7 +7,7 @@ export GO111MODULE = on
 
 # process build tags
 
-LEDGER_ENABLED ?= false
+LEDGER_ENABLED ?= true
 build_tags = netgo
 ifeq ($(LEDGER_ENABLED),true)
   ifeq ($(OS),Windows_NT)
@@ -48,6 +48,9 @@ ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=nibiru \
 		  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
 		  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)"
 
+ifeq ($(LINK_STATICALLY),true)
+  ldflags += -linkmode=external -extldflags "-Wl,-z,muldefs -static"
+endif
 ldflags += $(LDFLAGS)
 ldflags := $(strip $(ldflags))
 
@@ -71,3 +74,22 @@ lint:
 
 build:
 	go build $(BUILD_FLAGS) -o build/nibirud ./cmd/nibirud
+
+###################################################################
+###                          E2E Tests                          ###
+###################################################################
+PACKAGES_E2E=$(shell go list ./... | grep '/e2e')
+
+# build a node container
+.PHONY: docker-build-debug
+docker-build-debug:
+	@docker build -t cosmos/nibirud-e2e --build-arg IMG_TAG=debug -f e2e.Dockerfile .
+
+# build a relayer container
+.PHONY: docker-build-hermes
+docker-build-hermes:
+	@cd tests/e2e/docker; docker build -t cosmos/hermes-e2e:latest -f hermes.Dockerfile .
+
+.PHONY: test-e2e
+test-e2e:
+	@go test -mod=readonly -timeout=25m -v $(PACKAGES_E2E)
