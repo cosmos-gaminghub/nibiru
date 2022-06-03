@@ -110,7 +110,6 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		AddGenesisWasmMsgCmd(nibiru.DefaultNodeHome),
 		ExportAirdropSnapshotCmd(),
 		ImportGenesisAccountsFromSnapshotCmd(nibiru.DefaultNodeHome),
-		RollbackCmd(),
 		tmcli.NewCompletionCmd(rootCmd, true),
 		testnetCmd(nibiru.ModuleBasics, banktypes.GenesisBalancesIterator{}),
 		debug.Cmd(),
